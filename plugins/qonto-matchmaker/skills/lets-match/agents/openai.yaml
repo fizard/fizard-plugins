@@ -1,0 +1,7 @@
+interface:
+  display_name: "Let's Match"
+  short_description: "Connect your inbox and Qonto for receipt matching"
+  icon_small: "./assets/lets-match-small.png"
+  icon_large: "./assets/lets-match.svg"
+  brand_color: "#8B3DE8"
+  default_prompt: "Let's Match"

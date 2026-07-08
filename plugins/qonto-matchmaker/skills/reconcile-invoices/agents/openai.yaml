@@ -1,0 +1,7 @@
+interface:
+  display_name: "Reconcile Invoices"
+  short_description: "Match invoice PDFs to Qonto transactions by month"
+  icon_small: "./assets/reconcile-invoices-small.png"
+  icon_large: "./assets/reconcile-invoices.svg"
+  brand_color: "#8B3DE8"
+  default_prompt: "Reconcile my Qonto invoices for this month"

@@ -4,6 +4,12 @@ Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude
 Code and Cowork update per commit — their installed "version" is the git
 commit SHA.
 
+## 2026.7.9 — July 2026
+
+- Per-skill icons for Codex (`agents/openai.yaml` with `icon_small`/
+  `icon_large`): a match-heart for "Let's Match", an invoice-with-checkmark
+  for "Reconcile Invoices" — both in Fizard brand style.
+
 ## 2026.7.8 — July 2026
 
 - Fizard logo added (Codex: `interface.logo`/`composerIcon` + brand color;

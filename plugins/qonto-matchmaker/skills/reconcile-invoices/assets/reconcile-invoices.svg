@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B429D8"/>
+      <stop offset="1" stop-color="#5B4CF0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1000" height="1000" fill="url(#bg)"/>
+  <!-- invoice sheet -->
+  <rect x="270" y="180" width="400" height="540" rx="36" fill="#FFFFFF"/>
+  <!-- invoice lines, echoing the Fizard band curvature -->
+  <g fill="none" stroke="#8B3DE8" stroke-width="34" stroke-linecap="round">
+    <path d="M 340 300 Q 470 272 600 300"/>
+    <path d="M 340 410 Q 470 382 600 410"/>
+    <path d="M 340 520 Q 440 498 520 512"/>
+  </g>
+  <!-- check badge -->
+  <circle cx="672" cy="672" r="170" fill="#FFFFFF"/>
+  <circle cx="672" cy="672" r="130" fill="none" stroke="#8B3DE8" stroke-width="0"/>
+  <path d="M 596 676 L 652 732 L 760 610" fill="none" stroke="#8B3DE8" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
