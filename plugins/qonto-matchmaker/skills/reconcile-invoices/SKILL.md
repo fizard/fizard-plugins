@@ -11,15 +11,38 @@ a transaction is worse than a missing one — it corrupts bookkeeping silently �
 so the rules below are deliberately strict: upload only on high confidence,
 report everything else for the user to decide.
 
-## Requirements
+## Requirements and first-run setup
 
-- **Qonto MCP** (tools like `list_transactions`, `get_transaction`,
-  `request_attachment_upload`, `upload_attachment`). The plugin bundles the
-  server config (https://mcp.qonto.com/mcp); the user still has to
-  authenticate once. If the tools are unavailable, stop and tell the user to
-  authenticate the Qonto MCP first (in Claude Code: `/mcp`).
-- **Email access** via whatever is connected (Gmail MCP, Outlook/Microsoft
-  365 MCP, or a local CLI). If no email tool is available, stop and say so.
+Before anything else, check which tools are available. If something is
+missing, don't fail silently — walk the user through connecting it, one step
+at a time, then re-check. Only start the workflow when both sides work.
+
+**Qonto** — tools like `list_transactions`, `get_transaction`,
+`request_attachment_upload`, `upload_attachment`. If unavailable or
+unauthenticated, give the instruction matching the user's surface:
+
+- **Claude Code (terminal):** the plugin already bundles the server config —
+  run `/mcp`, pick `qonto`, authenticate in the browser.
+- **Claude desktop app / claude.ai:** Settings → Connectors
+  (claude.ai/settings/connectors) → Browse connectors → search **Qonto** →
+  Connect → log in and pick the organization.
+- **Codex:** the plugin bundles the server config — run
+  `codex mcp login qonto`.
+
+**Email** — any connected tool that can search mail and download PDF
+attachments. If none is available, ask which provider the user has, then:
+
+- **Gmail:** on the Claude desktop app / claude.ai, connect the built-in
+  **Gmail** connector (Settings → Connectors). For terminal-only setups,
+  Google's official remote MCP server needs a one-time Google Cloud setup:
+  https://developers.google.com/workspace/gmail/api/guides/configure-mcp-server
+- **Outlook / Microsoft 365:** community MCP server, e.g.
+  `claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server`, then
+  authenticate on first use.
+
+After the user reports they connected something, re-check tool availability.
+A new connection may require restarting the session — say so if the tools
+still don't appear. Never simulate results for a side that isn't connected.
 
 ## Modes
 

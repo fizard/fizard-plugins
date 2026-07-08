@@ -10,7 +10,7 @@
       "name": "qonto-matchmaker",
       "source": "./plugins/qonto-matchmaker",
       "description": "The matchmaker between your inbox and your bank account — finds Qonto transactions with missing receipts, matches invoice PDFs from your email, and attaches them via the bundled Qonto MCP",
-      "version": "2026.7.0"
+      "version": "2026.7.1"
     }
   ]
 }
