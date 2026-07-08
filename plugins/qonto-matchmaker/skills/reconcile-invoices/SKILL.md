@@ -88,6 +88,12 @@ requested month (see "Month argument"), widened by a few days on both sides
 since invoices often arrive shortly before or after the charge. Find emails
 with PDF attachments that look like invoices or receipts; download the PDFs
 to a temp directory.
+
+**Download in parallel, never one-by-one.** The downloads are independent —
+issue them as parallel tool calls in one batch (or, when downloading via
+shell, as concurrent jobs, e.g. `xargs -P 5`). Batch about 5 at a time to
+stay clear of provider rate limits; retry a failed download individually
+before giving up on that candidate.
 For each PDF, extract: all monetary amounts with currency and surrounding
 context, invoice/billing dates, sender address, and subject. If the user has
 more than one mailbox connected, collect from all of them and dedupe on the
@@ -133,11 +139,23 @@ For each open transaction, score every candidate PDF:
 ### 4. Upload (apply mode only)
 
 Per match, re-check first that the transaction still has no attachment
-(`get_transaction`) — the user may have uploaded manually in between. Then:
+(`get_transaction`) — the user may have uploaded manually in between. Then,
+per match:
 
 1. `request_attachment_upload` (file_name, `application/pdf`, size) → `upload_url` + `blob_ref`
 2. `curl -sf -X PUT -H "Content-Type: application/pdf" --upload-file <pdf> "<upload_url>"`
 3. `upload_attachment` with `blob_ref`, `target: "transaction"`, `transaction_id`
+
+**Upload matches in parallel.** The three steps above are sequential *within*
+one match, but matches are independent of each other — process them in
+concurrent batches of about 5 instead of serially. Stage-wise batching works
+well: fire the `get_transaction` re-checks for a batch as parallel tool
+calls, then the `request_attachment_upload` calls, then run the curl PUTs
+concurrently (`xargs -P 5` or shell background jobs with `wait`), then the
+`upload_attachment` calls. Never let results cross between matches — each
+`blob_ref` belongs to exactly one transaction; verify the pairing before
+step 3. If one match fails mid-chain, finish the others and report the
+failure; don't abort the batch.
 
 ### 5. Report
 

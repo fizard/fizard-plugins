@@ -4,6 +4,12 @@ Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude
 Code and Cowork update per commit — their installed "version" is the git
 commit SHA.
 
+## 2026.7.6 — July 2026
+
+- Faster runs: PDF downloads from the inbox and receipt uploads to Qonto now
+  run in parallel (concurrent batches of ~5) instead of one-by-one. Failures
+  are retried/reported individually without aborting the batch.
+
 ## 2026.7.5 — July 2026
 
 - `reconcile-invoices` without a month now always asks which month to
