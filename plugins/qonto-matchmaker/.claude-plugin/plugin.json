@@ -4,7 +4,7 @@
   "description": "Fizard Qonto Matchmaker — finds Qonto transactions with missing receipts, matches invoice PDFs from your email inbox, and attaches them via the bundled Qonto MCP",
   "author": {
     "name": "Fizard",
-    "email": "inbox@fizard.com"
+    "email": "marc@fizard.com"
   },
   "homepage": "https://github.com/fizard/fizard-plugins/blob/main/CHANGELOG.md"
 }
