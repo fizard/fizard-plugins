@@ -4,6 +4,12 @@ Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude
 Code and Cowork update per commit — their installed "version" is the git
 commit SHA.
 
+## 2026.7.5 — July 2026
+
+- `reconcile-invoices` without a month now always asks which month to
+  process before starting (current month suggested, previous month as
+  alternative) — it never picks one on its own.
+
 ## 2026.7.4 — July 2026
 
 - The self-update check is now surface-aware: it detects whether it runs in

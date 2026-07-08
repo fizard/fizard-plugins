@@ -63,8 +63,13 @@ The command takes a **month** (name or number, any language — "Juni", "6",
 "June"). The reconciliation window is that calendar month, **always in the
 current year** — never a past year, even if the month lies in the future of
 today's date; in that case point out that the month hasn't happened yet and
-ask what the user meant. If no month is given, ask which month to reconcile
-and suggest the current one.
+ask what the user meant.
+
+**No month given → always ask first.** Before doing anything else (after the
+self-update check), ask the user which month to reconcile — as a real
+question the user answers, with the current month as the suggested default
+and the previous month as an alternative. Never pick a month yourself and
+never start collecting emails or transactions until the user has answered.
 
 ## Modes
 
