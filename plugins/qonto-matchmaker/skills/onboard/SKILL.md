@@ -1,9 +1,9 @@
 ---
-name: lets-match
-description: Setup flow for the Qonto Matchmaker. Trigger on "Let's Match", "It's a Match", "Setup" or "Match Setup" in the Qonto/receipts context, on the first use of the plugin, and whenever reconcile-invoices finds a missing or unauthenticated connection. Verifies the email connector and the Qonto connection, confirming with the user which mailbox to use.
+name: onboard
+description: Onboarding flow for the Qonto Matchmaker. Trigger on "onboard", "setup", "set me up", "get started", the branded phrases "Let's Match" and "It's a Match" in the Qonto/receipts context, on the first use of the plugin, and whenever reconcile-invoices finds a missing or unauthenticated connection. Verifies the email connector and the Qonto connection, confirming with the user which mailbox to use.
 ---
 
-# Let's Match — Setup
+# Onboarding — Let's Match
 
 Get the user to a working pair of connections — one email source, one Qonto
 connection — so `/reconcile-invoices` can run without surprises. Talk to the

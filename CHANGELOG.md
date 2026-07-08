@@ -4,6 +4,16 @@ Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude
 Code and Cowork update per commit — their installed "version" is the git
 commit SHA.
 
+## 2026.7.10 — July 2026
+
+- Setup skill renamed `lets-match` → **`onboard`** (ecosystem convention, cf.
+  OpenClaw `onboard` / Anthropic `smb-onboard`); "Let's Match" and
+  "It's a Match" remain as branded trigger phrases. Codex display name:
+  "Onboarding".
+- New generated skill icons (full-bleed, Fizard gradient): plug-and-socket
+  with progress dots for onboarding, invoice-with-checkmark for
+  reconciliation.
+
 ## 2026.7.9 — July 2026
 
 - Per-skill icons for Codex (`agents/openai.yaml` with `icon_small`/

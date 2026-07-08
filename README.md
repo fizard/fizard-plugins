@@ -97,7 +97,7 @@ plugins/qonto-matchmaker/
 ├── .codex-plugin/plugin.json            Codex manifest + version
 ├── .mcp.json                            bundled Qonto MCP server config
 └── skills/
-    ├── lets-match/SKILL.md              setup flow ("Let's Match")
+    ├── onboard/SKILL.md                 onboarding flow ("Let's Match")
     └── reconcile-invoices/SKILL.md      the monthly reconciliation
 CHANGELOG.md                             what changed per release
 ```

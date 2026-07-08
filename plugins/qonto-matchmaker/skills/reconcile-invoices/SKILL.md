@@ -53,8 +53,8 @@ Before anything else, check that both sides are available: an email tool
 that can search mail and download PDF attachments, and the bundled Qonto MCP
 tools (authenticated — verify with a cheap probe call like
 `get_organization`, not just tool presence). If either is missing or
-unauthenticated, switch to the setup flow in the **`lets-match`** skill
-("Let's Match") and finish it before starting the workflow. Never simulate
+unauthenticated, switch to the onboarding flow in the **`onboard`** skill
+(trigger: "Let's Match") and finish it before starting the workflow. Never simulate
 results for a side that isn't connected.
 
 ## Month argument
