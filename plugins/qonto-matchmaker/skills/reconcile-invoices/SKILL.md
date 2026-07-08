@@ -1,6 +1,6 @@
 ---
 name: reconcile-invoices
-description: Use when the user wants to reconcile Qonto receipts with invoice emails — finding Qonto transactions with missing attachments ("fehlende Belege/Rechnungen"), matching invoice PDFs from the email inbox to them, and uploading validated receipts to Qonto via the Qonto MCP. Trigger on "reconcile receipts", "Belege abgleichen", "wo fehlen Rechnungen", "Rechnungen in Qonto hochladen", or any Qonto attachment/receipt housekeeping.
+description: Use when the user wants to reconcile Qonto receipts with invoice emails for a given month — finding Qonto transactions with missing attachments ("fehlende Belege/Rechnungen"), matching invoice PDFs from the email inbox to them, and uploading validated receipts to Qonto via the Qonto MCP. Takes a month as argument (e.g. "reconcile-invoices Juni"), always interpreted in the current year. Trigger on "reconcile receipts", "Belege abgleichen", "wo fehlen Rechnungen", "Rechnungen in Qonto hochladen", or any Qonto attachment/receipt housekeeping.
 ---
 
 # Fizard Qonto Matchmaker
@@ -11,38 +11,24 @@ a transaction is worse than a missing one — it corrupts bookkeeping silently �
 so the rules below are deliberately strict: upload only on high confidence,
 report everything else for the user to decide.
 
-## Requirements and first-run setup
+## Requirements
 
-Before anything else, check which tools are available. If something is
-missing, don't fail silently — walk the user through connecting it, one step
-at a time, then re-check. Only start the workflow when both sides work.
+Before anything else, check that both sides are available: an email tool
+that can search mail and download PDF attachments, and the bundled Qonto MCP
+tools (authenticated — verify with a cheap probe call like
+`get_organization`, not just tool presence). If either is missing or
+unauthenticated, switch to the setup flow in the **`lets-match`** skill
+("Let's Match") and finish it before starting the workflow. Never simulate
+results for a side that isn't connected.
 
-**Qonto** — tools like `list_transactions`, `get_transaction`,
-`request_attachment_upload`, `upload_attachment`. If unavailable or
-unauthenticated, give the instruction matching the user's surface:
+## Month argument
 
-- **Claude Code (terminal):** the plugin already bundles the server config —
-  run `/mcp`, pick `qonto`, authenticate in the browser.
-- **Claude desktop app / claude.ai:** Settings → Connectors
-  (claude.ai/settings/connectors) → Browse connectors → search **Qonto** →
-  Connect → log in and pick the organization.
-- **Codex:** the plugin bundles the server config — run
-  `codex mcp login qonto`.
-
-**Email** — any connected tool that can search mail and download PDF
-attachments. If none is available, ask which provider the user has, then:
-
-- **Gmail:** on the Claude desktop app / claude.ai, connect the built-in
-  **Gmail** connector (Settings → Connectors). For terminal-only setups,
-  Google's official remote MCP server needs a one-time Google Cloud setup:
-  https://developers.google.com/workspace/gmail/api/guides/configure-mcp-server
-- **Outlook / Microsoft 365:** community MCP server, e.g.
-  `claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server`, then
-  authenticate on first use.
-
-After the user reports they connected something, re-check tool availability.
-A new connection may require restarting the session — say so if the tools
-still don't appear. Never simulate results for a side that isn't connected.
+The command takes a **month** (name or number, any language — "Juni", "6",
+"June"). The reconciliation window is that calendar month, **always in the
+current year** — never a past year, even if the month lies in the future of
+today's date; in that case point out that the month hasn't happened yet and
+ask what the user meant. If no month is given, ask which month to reconcile
+and suggest the current one.
 
 ## Modes
 
@@ -56,8 +42,10 @@ still don't appear. Never simulate results for a side that isn't connected.
 
 ### 1. Collect invoice candidates from email
 
-Search the inbox (and archive) over the reconciliation window — default the
-last 60 days, or the range the user names. Find emails with PDF attachments
+Search the inbox (and archive) over the reconciliation window — the
+requested month (see "Month argument"), widened by a few days on both sides
+since invoices often arrive shortly before or after the charge. Find emails
+with PDF attachments
 that look like invoices or receipts; download the PDFs to a temp directory.
 For each PDF, extract: all monetary amounts with currency and surrounding
 context, invoice/billing dates, sender address, and subject. If the user has
