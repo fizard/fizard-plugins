@@ -1,5 +1,34 @@
 # Changelog
 
+Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude
+Code and Cowork update per commit — their installed "version" is the git
+commit SHA.
+
+## 2026.7.4 — July 2026
+
+- The self-update check is now surface-aware: it detects whether it runs in
+  Claude Code, Cowork/desktop, claude.ai, Codex, or a standalone skill
+  install, and offers exactly the matching update command — running it
+  directly where a shell is available.
+
+## 2026.7.3 — July 2026
+
+- Self-update check: on each run the skill compares the installed plugin
+  version against the repo head and, if outdated, tells the user how to
+  update. Best-effort — never blocks the reconciliation.
+
+## 2026.7.2 — July 2026
+
+- New **"Let's Match"** setup skill (triggers: "Let's Match", "It's a
+  Match", "Setup"): verifies the email connector — naming an already
+  connected one and asking the user to confirm it — then the Qonto
+  connection, before handing over to the reconciliation.
+- `reconcile-invoices` now takes a **month** argument (name or number, any
+  language), always interpreted in the current year.
+- Display name is now **Qonto Matchmaker** on all surfaces.
+- Repository renamed to `fizard/fizard-plugins`; Claude manifests switched
+  to commit-based versioning (every commit is a release for Claude clients).
+
 ## 2026.7.1 — July 2026
 
 - Guided first-run setup: if Qonto or email tools are missing, the skill now

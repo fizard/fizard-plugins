@@ -68,18 +68,24 @@ existing connection, which keeps working as-is.
   [ms-365-mcp-server](https://github.com/softeria/ms-365-mcp-server)
   (`claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server`).
 
-Try it: *"Wo fehlen Belege?"* or *"Reconcile my receipts."*
+**Getting started:** say **"Let's Match"** — the setup flow verifies your
+email connector (naming an existing one for you to confirm) and the Qonto
+connection. From then on: `/reconcile-invoices <Monat>` (e.g.
+`/reconcile-invoices Juni` — the month is always read in the current year),
+or just ask *"Wo fehlen Belege?"*.
 
 ## Release workflow (Fizard-internal)
 
 1. Update skill content under `plugins/<plugin>/skills/`.
-2. Bump the version (scheme `YEAR.MONTH.PATCH`) in **all three** places:
-   - `plugins/<plugin>/.claude-plugin/plugin.json`
-   - `plugins/<plugin>/.codex-plugin/plugin.json`
-   - `.claude-plugin/marketplace.json`
-3. Add a `CHANGELOG.md` entry.
-4. Commit and push. Claude Code clients with auto-update get the new version
-   on their next start; Codex and skills-CLI clients on their next update.
+2. Bump the version (scheme `YEAR.MONTH.PATCH`) in
+   `plugins/<plugin>/.codex-plugin/plugin.json` — **only there**. The Claude
+   manifests deliberately carry no version: for Claude Code and Cowork every
+   commit on `main` *is* a release (the commit SHA becomes the version), while
+   Codex caches by manifest version and needs the bump to pick up changes.
+3. Add a `CHANGELOG.md` entry under the new Codex version.
+4. `claude plugin validate .claude-plugin/marketplace.json`, then commit and
+   push to `main`. Claude clients with auto-update get the new state on their
+   next start; Codex and skills-CLI clients on their next manual update.
 
 ## Structure
 
@@ -90,10 +96,12 @@ plugins/qonto-matchmaker/
 ├── .claude-plugin/plugin.json           Claude Code manifest + version
 ├── .codex-plugin/plugin.json            Codex manifest + version
 ├── .mcp.json                            bundled Qonto MCP server config
-└── skills/reconcile-invoices/SKILL.md   the skill — one file, all agents
+└── skills/
+    ├── lets-match/SKILL.md              setup flow ("Let's Match")
+    └── reconcile-invoices/SKILL.md      the monthly reconciliation
 CHANGELOG.md                             what changed per release
 ```
 
 Both plugin systems expect `skills/` at the plugin root, so a single plugin
-directory carries both manifests and one shared SKILL.md. New plugins get
-their own `plugins/<name>/` directory plus an entry in **both** catalogs.
+directory carries both manifests and one shared set of skills. New plugins
+get their own `plugins/<name>/` directory plus an entry in **both** catalogs.

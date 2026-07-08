@@ -81,8 +81,8 @@ and suggest the current one.
 Search the inbox (and archive) over the reconciliation window — the
 requested month (see "Month argument"), widened by a few days on both sides
 since invoices often arrive shortly before or after the charge. Find emails
-with PDF attachments
-that look like invoices or receipts; download the PDFs to a temp directory.
+with PDF attachments that look like invoices or receipts; download the PDFs
+to a temp directory.
 For each PDF, extract: all monetary amounts with currency and surrounding
 context, invoice/billing dates, sender address, and subject. If the user has
 more than one mailbox connected, collect from all of them and dedupe on the
