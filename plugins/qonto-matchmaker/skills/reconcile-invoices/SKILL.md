@@ -3,7 +3,7 @@ name: reconcile-invoices
 description: Use when the user wants to reconcile Qonto receipts with invoice emails — finding Qonto transactions with missing attachments ("fehlende Belege/Rechnungen"), matching invoice PDFs from the email inbox to them, and uploading validated receipts to Qonto via the Qonto MCP. Trigger on "reconcile receipts", "Belege abgleichen", "wo fehlen Rechnungen", "Rechnungen in Qonto hochladen", or any Qonto attachment/receipt housekeeping.
 ---
 
-# Fizard Matchmaker
+# Fizard Qonto Matchmaker
 
 Match invoice PDFs from the user's email inbox to Qonto transactions that are
 missing their receipt, validate each match, and upload it. A wrong receipt on
