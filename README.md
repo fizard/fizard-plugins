@@ -17,6 +17,15 @@ To receive updates automatically: `/plugin` → **Marketplaces** tab →
 select `fizard` → **Enable auto-update**. Or update manually any time with
 `/plugin marketplace update fizard`.
 
+**Using the desktop app?** The `/plugin` command is terminal-only. Run the
+same thing once in any terminal instead — the plugin is then available
+everywhere, including the desktop app (new sessions):
+
+```bash
+claude plugin marketplace add fizard/plugins
+claude plugin install qonto-matchmaker@fizard
+```
+
 ### Codex
 
 ```
