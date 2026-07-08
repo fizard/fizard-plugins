@@ -4,6 +4,11 @@ Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude
 Code and Cowork update per commit — their installed "version" is the git
 commit SHA.
 
+## 2026.7.15 — July 2026
+
+- Refreshed skill icons: handshake (onboarding) and invoice-with-checkmark
+  (reconciliation) with more breathing room around the glyphs.
+
 ## 2026.7.14 — July 2026
 
 - **The attachment audit now runs before the matching** (step 3 of 9):
