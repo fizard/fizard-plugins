@@ -1,6 +1,6 @@
 {
   "name": "qonto-matchmaker",
-  "version": "2026.7.15",
+  "version": "2026.7.16",
   "homepage": "https://fizard.com",
   "interface": {
     "displayName": "Qonto Matchmaker by Fizard",

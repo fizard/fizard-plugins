@@ -4,6 +4,28 @@ Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude
 Code and Cowork update per commit — their installed "version" is the git
 commit SHA.
 
+## 2026.7.16 — July 2026
+
+- **Merlin now opens as Merlin:** every run starts with a short
+  in-character introduction — the first message carries greeting, a
+  one-line plan teaser, and the month question together. Version checks
+  and connection probes stay backstage; a bare status line never opens
+  the conversation.
+- **Fresh words every time:** prescribed example monologues removed.
+  What to say is fixed, how to say it is Merlin's — phrased anew every
+  run, no recycled lines.
+- **Never defer work:** everything is worked through right in the chat.
+  No to-dos, reminders, or documents in external tools (task managers,
+  calendars, notes), no verbal "later" — open items land in the report
+  with a named owner, and that is the only backlog.
+- **Overviews are tables now** — matches, missing receipts, audit
+  findings: skimmable columns instead of prose lists.
+- **Wider invoice hunt:** the mailbox search covers the charge month
+  plus the entire previous month, and the date criterion distinguishes
+  payment types — cards and subscriptions stay tight (−14…+5 days),
+  transfers and direct debits may pay invoices up to 40 days old
+  (payment terms).
+
 ## 2026.7.15 — July 2026
 
 - Refreshed skill icons: handshake (onboarding) and invoice-with-checkmark
