@@ -4,6 +4,29 @@ Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude
 Code and Cowork update per commit — their installed "version" is the git
 commit SHA.
 
+## 2026.7.13 — July 2026
+
+- **Attachment audit as the final step:** every standard run now ends by
+  verifying the receipts that are already attached — same criteria,
+  opposite direction. Wrong ones get replaced or removed only with the
+  user's explicit approval; scheduled runs only report. Also available
+  standalone ("prüfe die hochgeladenen Belege", "audit receipts").
+- **Roadmap opener:** Merlin starts each run with the short version of
+  the journey — step by step, finished month at the end — and calls out
+  the stations as he passes them.
+- **Explicit browser checks per surface:** onboarding and the portal step
+  now look for the exact integration by name — **Claude in Chrome** on
+  Claude surfaces (lookalike MCPs don't count), the built-in **Chrome**
+  plugin with the **Codex Chrome Extension** on Codex; a Chrome DevTools
+  MCP stays the fallback for other agents. When offering it, Merlin
+  explains capability and boundary: passwords never pass through him —
+  the user logs in, he only drives the already-open session.
+- **Tool gate before every step:** each workflow step first verifies that
+  the tool it needs is available and authenticated right now (cheap probe
+  calls when in doubt) — never run a step against a missing tool, never
+  fake its result.
+- Codex prompt cards reordered: "Set me up" now comes first.
+
 ## 2026.7.12 — July 2026
 
 - **Meet Merlin.** The plugin now speaks with one voice: Merlin, the

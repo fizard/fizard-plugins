@@ -53,7 +53,9 @@ transactions with missing receipts, matches invoice PDFs from your email
 inbox against them (exact amount, vendor, date — and only when the match
 is unambiguous), attaches confident matches automatically via the Qonto
 MCP, and ends every run with a progress report: what's done, what's
-missing, where to find the rest.
+missing, where to find the rest. Each run ends with an audit of the
+receipts already attached — wrong ones get replaced or removed, each
+only with your approval.
 
 Fair warning: it has a personality, and his name is **Merlin**. Think
 best friend with a mission — he makes receipt-chasing fun, doesn't mince
@@ -79,9 +81,10 @@ existing connection, which keeps working as-is.
 **Optional, recommended: browser access.** Some receipts never arrive as
 email attachments (Stripe receipt links, portal downloads from Google,
 Apple, …). With the [Claude in Chrome](https://claude.ai/chrome) extension
-connected (Codex users: a Chrome DevTools MCP), the matchmaker offers to
-download those straight from the vendor portal — you handle the login, it
-handles the rest. Without it they stay a manual download.
+connected (Codex: the built-in **Chrome** plugin plus the Codex Chrome
+Extension), the matchmaker offers to download those straight from the
+vendor portal — you handle the login, it handles the rest. Without it
+they stay a manual download.
 
 **Getting started:** run `/reconcile-invoices <Monat>` (e.g.
 `/reconcile-invoices Juni` — the month is always read in the current year)

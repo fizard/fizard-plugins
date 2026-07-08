@@ -121,10 +121,29 @@ access, `reconcile-invoices` can fetch those directly from the vendor
 portal when nothing turns up in the inbox, instead of leaving them as
 manual work for the user.
 
-Check whether browser-control tools are already available (e.g. the Claude
-in Chrome tools or a Chrome DevTools MCP). If yes, name what you found and
-move on. If not, explain the benefit in one sentence and ask whether to set
-it up now — accept a "skip" gracefully:
+Check **explicitly for the one integration that matches the surface** —
+"some browser tool is present" is not enough:
+
+- On **Claude** surfaces: the **Claude in Chrome** tools (the official
+  extension-based integration). Similar-sounding Chrome MCPs — e.g.
+  "Control Chrome" — are not it and don't replace the extension.
+- On **Codex**: the built-in **Chrome** plugin ("Control Chrome with
+  Codex") together with its **Codex Chrome Extension**.
+
+If the matching one is connected, name it and move on. If not, **ask the
+user explicitly and by name** — and when offering it, explain in Merlin's
+own words both what it enables and where the line is: he can then visit
+the vendor sites, drive the browser, and download the invoices himself —
+but **passwords never pass through him**. Logging in stays the user's
+move, in their own browser; Merlin only works inside the session that is
+already open. Roughly:
+
+> I can then open the vendor portals, click through, and pull the
+> invoices myself. Your passwords stay yours — you do any login, I only
+> drive the session you've already opened.
+
+Then the question whether to set it up now — accepting a "skip"
+gracefully:
 
 - **Claude Code (terminal):** needs the **Claude in Chrome** browser
   extension (install via https://claude.ai/chrome) — then run `/chrome`
@@ -132,9 +151,13 @@ it up now — accept a "skip" gracefully:
 - **Claude desktop app / claude.ai:** install the **Claude in Chrome**
   extension from https://claude.ai/chrome and sign in with the same Claude
   account; the browser tools appear once the extension is connected.
-- **Codex / other agents:** the Claude extension doesn't apply — use
-  Google's Chrome DevTools MCP instead, e.g.
-  `codex mcp add chrome-devtools -- npx chrome-devtools-mcp@latest`.
+- **Codex:** enable the built-in **Chrome** plugin ("Control Chrome with
+  Codex", under `/plugins`) and install the **Codex Chrome Extension**
+  from its Setup section — it works with the user's existing browser
+  logins, exactly what portal downloads need.
+- **Any other agent:** a Chrome DevTools MCP is the generic fallback
+  (e.g. `npx chrome-devtools-mcp@latest`); depending on setup it may not
+  share the user's logged-in sessions.
 
 Re-check after setup; a new connection may require restarting the session.
 If the user skips, continue to the wrap-up — portal invoices then simply

@@ -1,6 +1,6 @@
 {
   "name": "qonto-matchmaker",
-  "version": "2026.7.12",
+  "version": "2026.7.13",
   "homepage": "https://fizard.com",
   "interface": {
     "displayName": "Qonto Matchmaker by Fizard",
@@ -9,9 +9,9 @@
     "logo": "./assets/logo.png",
     "websiteURL": "https://fizard.com",
     "defaultPrompt": [
+      "Set me up",
       "Reconcile my Qonto invoices for this month",
-      "Where are receipts missing?",
-      "Set me up"
+      "Where are receipts missing?"
     ]
   },
   "author": {

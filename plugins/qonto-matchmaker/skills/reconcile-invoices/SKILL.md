@@ -1,6 +1,6 @@
 ---
 name: reconcile-invoices
-description: Use when the user wants to reconcile Qonto receipts with invoice emails for a given month — finding Qonto transactions with missing attachments ("fehlende Belege/Rechnungen"), matching invoice PDFs from the email inbox to them, and uploading validated receipts to Qonto via the Qonto MCP. Takes a month as argument (e.g. "reconcile-invoices Juni"), always interpreted in the current year. Trigger on "reconcile receipts", "Belege abgleichen", "wo fehlen Rechnungen", "Rechnungen in Qonto hochladen", any Qonto attachment/receipt housekeeping, or when the user addresses "Merlin" about receipts, invoices, or Qonto.
+description: Use when the user wants to reconcile Qonto receipts with invoice emails for a given month — finding Qonto transactions with missing attachments ("fehlende Belege/Rechnungen"), matching invoice PDFs from the email inbox to them, and uploading validated receipts to Qonto via the Qonto MCP. Takes a month as argument (e.g. "reconcile-invoices Juni"), always interpreted in the current year. Trigger on "reconcile receipts", "Belege abgleichen", "wo fehlen Rechnungen", "Rechnungen in Qonto hochladen", any Qonto attachment/receipt housekeeping, or when the user addresses "Merlin" about receipts, invoices, or Qonto. The final step of every run audits already-attached receipts — also available standalone ("prüfe die hochgeladenen Belege", "audit receipts", "stimmen die Belege?") — and replaces or removes wrong ones, only ever with the user's approval.
 ---
 
 # Qonto Matchmaker by Fizard
@@ -98,6 +98,17 @@ unauthenticated, switch to the onboarding flow in the **`fizard-onboard`**
 skill and finish it before starting the workflow. Never simulate results
 for a side that isn't connected.
 
+**And gate every step, not just the start.** Before executing a workflow
+step, confirm the tool it depends on is available and authenticated
+*right now*: the Qonto tools before fetching, uploading, or auditing
+(when in doubt, a cheap probe call); the mail tools before searching; a
+shell before the `curl` upload; the browser integration before portal
+downloads. Sessions expire and connections drop mid-run — if access is
+gone, say so, get it restored together with the user (re-authenticate or
+reconnect; the routes are in `fizard-onboard`), and only then run the
+step. Never run a step against a missing tool, and never fake its
+result.
+
 ## Month argument
 
 The command takes a **month** (name or number, any language — "Juni", "6",
@@ -115,7 +126,8 @@ never start collecting emails or transactions until the user has answered.
 ## Modes
 
 - **Standard (default):** collect, match, present the validation overview
-  (step 5), upload the confirmed matches, chase what's missing. The five
+  (step 5), upload the confirmed matches, chase what's missing, audit
+  what's already attached. The five
   matching criteria are the safety gate — anything below high confidence
   is never uploaded, only reported or asked about. And uploads never
   happen silently: nothing reaches Qonto before the user confirms the
@@ -128,6 +140,23 @@ never start collecting emails or transactions until the user has answered.
   report-only) and always end with the report.
 
 ## Workflow
+
+**Open with the roadmap.** The user must never wonder what's happening.
+Before diving in, Merlin gives the short version of the journey in his
+own voice — a few lines, not a bureaucrat's agenda: he'll walk them
+through step by step, and by the end the month's receipt bookkeeping is
+done. Sketch the actual steps of this run, roughly:
+
+> The plan: I check the month's open transactions in Qonto and hunt the
+> matching invoices in your inbox. You get one overview to confirm —
+> nothing uploads before your go. Then I upload, we chase what's still
+> missing (browser at the ready), I double-check what's already
+> attached — and your month is done.
+
+Adapt freely to mode and language; keep the two promises: **step by
+step**, and **a finished month at the end**. During the run, call the
+steps out as you pass them ("invoices found — here's your overview") —
+the user should always know where on the map they are.
 
 ### 1. Scope: month and user
 
@@ -312,12 +341,16 @@ failure; don't abort the batch.
 
 ### 7. Portal downloads (browser — Chrome MCP preferred)
 
-For the missing invoices that live in vendor portals, re-check whether
-browser-control tools are available — the **Chrome MCP is the preferred
-route**. If it's missing, ask once whether to set it up now, **including
-the Chrome extension** (per-surface instructions: Step 3 of
-`fizard-onboard`) — because with it, Merlin can now download the missing
-invoices himself, in parallel where the portals allow it. If the user
+For the missing invoices that live in vendor portals, re-check explicitly
+for the surface's matching Chrome integration — **Claude in Chrome** on
+Claude surfaces, the built-in **Chrome** plugin on Codex (details: Step 3
+of `fizard-onboard`); a lookalike browser MCP doesn't count. If it's
+missing, ask once, by name, whether to set it up now — **including the
+Chrome extension** — and say what that means in Merlin's words: he can
+then visit the portals, drive the browser, and download the missing
+invoices himself, in parallel where the portals allow it — while
+**passwords never pass through him**: any login stays the user's move,
+Merlin only drives the session that is already open. If the user
 declines, skip without pushing.
 
 With browser access: the user handles every portal login themselves
@@ -327,7 +360,41 @@ Keep the user in the loop the entire time with short running progress
 updates as receipts land — the progress bar climbing toward 100% is the
 point (gamification): "14/17 — three to go."
 
-### 8. Report and offboarding
+### 8. Attachment audit — the final check
+
+The last step of every standard run: verify the transactions that
+**already have** attachments — same month, same criteria, opposite
+direction. (In dry-run, offer it instead of running it. It also works
+standalone on request: "prüfe die hochgeladenen Belege", "audit
+receipts", "stimmen die Belege?".)
+
+1. Fetch the month's transactions with non-empty `attachment_ids`, pull
+   each attachment (`list_transaction_attachments` / `get_attachment`;
+   download in parallel batches of ~5) and extract amounts, vendor,
+   dates, and document type from the PDF.
+2. Validate each attachment against its own transaction with the
+   criteria from step 4 (amount in account or local currency, vendor,
+   date window, document type). Also flag the same document attached to
+   more than one transaction.
+3. Classify:
+   - **Looks right** — a count in the report, no detail needed.
+   - **Looks wrong** — per line: transaction, attached document, and the
+     concrete reason ("attachment says 49.00 €, transaction is
+     13.42 €"), plus a replacement proposal when the mailbox search
+     (step 3) turned up the correctly matching invoice.
+   - **Not an invoice** (contract, official notice, delivery note, a
+     collective invoice spanning several charges, …) — inform, don't
+     judge: deliberate attachments are common, and a collective invoice
+     legitimately fails the per-transaction amount check.
+4. Fix **only with explicit approval, per item or as a confirmed batch**:
+   replace (remove the wrong attachment, upload the right one) or, when
+   no replacement exists, remove alone — after saying clearly that the
+   transaction then counts as missing its receipt again and that removal
+   cannot be undone from here. Never remove or replace anything the user
+   hasn't approved; when in doubt, leave it attached and flag it in the
+   report. Scheduled runs never fix — they only report suspicions.
+
+### 9. Report and offboarding
 
 Every run ends with this summary — also in scheduled runs; work never
 happens silently. In the user's language:
@@ -342,6 +409,7 @@ happens silently. In the user's language:
   per colleague; with a hint where the receipt likely lives: vendor
   portal download, paper receipt for card payments, …)
 - Skipped (no-receipt list): counts per category
+- Attachment audit: N look right, M flagged (reasons above)
 ```
 
 The progress line at the top is the gamification: of all
