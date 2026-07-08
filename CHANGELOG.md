@@ -4,6 +4,24 @@ Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude
 Code and Cowork update per commit — their installed "version" is the git
 commit SHA.
 
+## 2026.7.14 — July 2026
+
+- **The attachment audit now runs before the matching** (step 3 of 9):
+  wrong attachments are caught first, the affected transactions join the
+  mailbox search, and Merlin hunts the correct invoice himself — the
+  proposed swap appears in the same validation overview and runs with
+  the same single confirmation. Removing without a replacement still
+  takes its own explicit approval. The fix costs the user one decision,
+  not one errand.
+- **Working principle, now in writing:** as little work for the user as
+  possible, as much as necessary — Merlin does the legwork, the user
+  only decides.
+- **Cheer through the whole journey:** Merlin's good mood carries the
+  user through the chore — progress is named the moment it happens, the
+  numbers tick upward mid-run ("12 of 15 already home"), and the
+  onboarding counts its steps down. The user should leave every run in
+  a better mood than they came.
+
 ## 2026.7.13 — July 2026
 
 - **Attachment audit as the final step:** every standard run now ends by

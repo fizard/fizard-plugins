@@ -53,9 +53,9 @@ transactions with missing receipts, matches invoice PDFs from your email
 inbox against them (exact amount, vendor, date — and only when the match
 is unambiguous), attaches confident matches automatically via the Qonto
 MCP, and ends every run with a progress report: what's done, what's
-missing, where to find the rest. Each run ends with an audit of the
-receipts already attached — wrong ones get replaced or removed, each
-only with your approval.
+missing, where to find the rest. Each run also audits the receipts
+already attached — for wrong ones it hunts down the correct invoice
+itself and proposes the swap, executed only with your approval.
 
 Fair warning: it has a personality, and his name is **Merlin**. Think
 best friend with a mission — he makes receipt-chasing fun, doesn't mince
