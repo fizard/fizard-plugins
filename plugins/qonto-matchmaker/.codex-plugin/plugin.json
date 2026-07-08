@@ -1,6 +1,6 @@
 {
   "name": "qonto-matchmaker",
-  "version": "2026.7.10",
+  "version": "2026.7.11",
   "interface": {
     "displayName": "Qonto Matchmaker",
     "brandColor": "#8B3DE8",

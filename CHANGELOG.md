@@ -4,6 +4,11 @@ Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude
 Code and Cowork update per commit — their installed "version" is the git
 commit SHA.
 
+## 2026.7.11 — July 2026
+
+- Onboarding skill renamed `onboard` → **`fizard-onboard`** (brand-prefixed
+  like Anthropic's `smb-onboard`, collision-safe across plugins).
+
 ## 2026.7.10 — July 2026
 
 - Setup skill renamed `lets-match` → **`onboard`** (ecosystem convention, cf.
