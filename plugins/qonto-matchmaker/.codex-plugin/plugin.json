@@ -1,6 +1,9 @@
 {
   "name": "qonto-matchmaker",
   "version": "2026.7.1",
+  "interface": {
+    "displayName": "Qonto Matchmaker"
+  },
   "description": "Fizard Qonto Matchmaker — finds Qonto transactions with missing receipts, matches invoice PDFs from your email inbox, and attaches them via the bundled Qonto MCP",
   "skills": "./skills/",
   "mcpServers": "./.mcp.json"
