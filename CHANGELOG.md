@@ -4,6 +4,32 @@ Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude
 Code and Cowork update per commit — their installed "version" is the git
 commit SHA.
 
+## 2026.7.20 — July 2026
+
+- **Simpler run, three steps:** ① find the missing receipts (exclusion
+  list applied) and hunt them in the inboxes — one match table, one
+  confirmation, upload, done-count. ② The audit of receipts that were
+  already attached before the run is now **offered as a question**, not
+  forced — fixes only on explicit approval. ③ The wrap-up: missing
+  receipts **with the card holder**, a "Please review" section
+  (something is attached but couldn't be validated one hundred percent,
+  with plain-language reasons), the chat hand-off, and feedback.
+- **Hand-off without pressure:** drop any subset of receipts into the
+  chat (validated, then uploaded) — or none at all. Whatever stays open
+  counts as "not provided" and never breaks the run.
+- **Duplicate guards:** identical invoice copies (forwarded, CC'd into
+  a second inbox) dedupe into one candidate; an invoice number ends up
+  attached to at most one transaction; the audit flags multi-attached
+  documents.
+- **Portal downloads removed from this skill — deliberately:** the
+  matchmaker sticks to matching inboxes against Qonto so runs stay
+  short and focused. A dedicated portal-download skill is coming;
+  onboarding still sets the browser up so it's ready the moment it
+  ships.
+- Feedback invitation is now part of every wrap-up; dry-run continues
+  through to the wrap-up; scheduled runs skip the hand-off and include
+  or skip the audit per routine configuration.
+
 ## 2026.7.19 — July 2026
 
 - **The run is four user-facing steps now** — the user's work arrives in

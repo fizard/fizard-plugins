@@ -1,13 +1,13 @@
 ---
 name: fizard-onboard
-description: Onboarding flow for the Qonto Matchmaker. Trigger on "onboard", "setup", "set me up", "get started", on the first use of the plugin, and whenever reconcile-invoices finds a missing or unauthenticated connection. Checks the Qonto connection first, then verifies that every mailbox receiving invoices is connected and confirmed by the user, then offers optional browser access (Claude in Chrome extension / Chrome DevTools MCP) for downloading portal-only invoices.
+description: Onboarding flow for the Qonto Matchmaker. Trigger on "onboard", "setup", "set me up", "get started", on the first use of the plugin, and whenever reconcile-invoices finds a missing or unauthenticated connection. Checks the Qonto connection first, then verifies that every mailbox receiving invoices is connected and confirmed by the user, then offers optional browser access (Claude in Chrome extension on Claude surfaces, the Chrome plugin with its extension on Codex) for downloading portal-only invoices.
 ---
 
 # Onboarding
 
-Get the user to a working pair of connections — one email source, one Qonto
-connection — plus, optionally, browser access for portal downloads, so
-`/reconcile-invoices` can run without surprises.
+Get the user to a working setup — the Qonto connection plus every
+mailbox that receives invoices — and, optionally, browser access for
+portal downloads, so `/reconcile-invoices` can run without surprises.
 
 ## Personality
 
@@ -119,6 +119,8 @@ Map the answers against what's connected:
   - **Outlook / Microsoft 365:** community MCP server, e.g.
     `claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server`, then
     authenticate on first use.
+  - On **Codex**, add mail MCPs with `codex mcp add …` instead of
+    `claude mcp add …`; the server packages are the same.
 
 After each new connection, re-check tool availability. A new connection
 may require restarting the session — say so if the tools still don't
@@ -129,10 +131,10 @@ mailbox list back to them for that confirmation.
 ## Step 3: Browser access (optional, recommended)
 
 Some receipts never arrive as email attachments — Stripe receipt links,
-portal-download invoices from Google, Apple, and similar. With browser
-access, `reconcile-invoices` can fetch those directly from the vendor
-portal when nothing turns up in the inbox, instead of leaving them as
-manual work for the user.
+portal-download invoices from Google, Apple, and similar. Browser access
+is what will let Fizard tooling fetch those straight from the vendor
+portals: a dedicated portal-download skill is on its way, and setting
+the browser up now means it's ready the moment it ships.
 
 Check **explicitly for the one integration that matches the surface** —
 "some browser tool is present" is not enough:

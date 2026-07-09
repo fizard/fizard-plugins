@@ -1,6 +1,6 @@
 ---
 name: reconcile-invoices
-description: Use when the user wants to reconcile Qonto receipts with invoice emails for a given month — finding Qonto transactions with missing attachments ("fehlende Belege/Rechnungen"), matching invoice PDFs from the email inbox to them, and uploading validated receipts to Qonto via the Qonto MCP. Takes a month as argument (e.g. "reconcile-invoices Juni"), always interpreted in the current year. Trigger on "reconcile receipts", "Belege abgleichen", "wo fehlen Rechnungen", "Rechnungen in Qonto hochladen", any Qonto attachment/receipt housekeeping, or when the user addresses "Merlin" about receipts, invoices, or Qonto. Every run also audits already-attached receipts before the matching — available standalone too ("prüfe die hochgeladenen Belege", "audit receipts", "stimmen die Belege?") — hunts replacements for wrong ones itself, and replaces or removes them only ever with the user's approval.
+description: Use when the user wants to reconcile Qonto receipts with invoice emails for a given month — finding Qonto transactions with missing attachments ("fehlende Belege/Rechnungen"), matching invoice PDFs from the email inbox to them, and uploading validated receipts to Qonto via the Qonto MCP. Takes a month as argument (e.g. "reconcile-invoices Juni"), always interpreted in the current year. Trigger on "reconcile receipts", "Belege abgleichen", "wo fehlen Rechnungen", "Rechnungen in Qonto hochladen", any Qonto attachment/receipt housekeeping, or when the user addresses "Merlin" about receipts, invoices, or Qonto. After the upload round it offers an optional audit of the receipts that were already attached before the run — available standalone too ("prüfe die hochgeladenen Belege", "audit receipts", "stimmen die Belege?") — and fixes wrong ones only ever with the user's approval.
 ---
 
 # Qonto Matchmaker by Fizard
@@ -130,8 +130,8 @@ for a side that isn't connected.
 step, confirm the tool it depends on is available and authenticated
 *right now*: the Qonto tools before fetching, uploading, or auditing
 (when in doubt, a cheap probe call); the mail tools before searching; a
-shell before the `curl` upload; the browser integration before portal
-downloads. Sessions expire and connections drop mid-run — if access is
+shell before the `curl` upload. Sessions expire and connections drop
+mid-run — if access is
 gone, say so, get it restored together with the user (re-authenticate or
 reconnect; the routes are in `fizard-onboard`), and only then run the
 step. Never run a step against a missing tool, and never fake its
@@ -145,12 +145,11 @@ for creating to-dos, reminders, or documents), and not verbally
 ("I'll get back to this") either. The chat is the workbench: overviews,
 questions, decisions, and results all happen right here. What genuinely
 cannot be finished in this run — a receipt only a colleague has, a
-portal only the user can open — goes into the report as an open item
+portal only the user can open — goes into the wrap-up as an open item
 with a named owner; that is the only backlog there is. The workflow's
-own tools stay what they are: mail, the Qonto MCP, a shell, the browser
-integration (step 4), and — solely for the routine offer — the
-surface's scheduler. Anything beyond that only on the user's explicit
-ask.
+own tools stay what they are: mail, the Qonto MCP, a shell, and —
+solely for the routine offer — the surface's scheduler. Anything beyond
+that only on the user's explicit ask.
 
 ## Month argument
 
@@ -168,20 +167,19 @@ never start collecting emails or transactions until the user has answered.
 
 ## Modes
 
-- **Standard (default):** audit what's already attached (step 1), hunt
-  the missing invoices (step 2), present the upload overview and upload
-  after the user's go (step 3), close with one final overview of what's
-  left and help clear it (step 4). The five matching criteria are the
-  safety gate — anything below high confidence is never uploaded, only
-  reported or asked about. And uploads never happen silently: nothing
-  reaches Qonto before the user confirms the overview, and every run
-  ends with the final overview.
-- **Dry-run:** audit, hunt, show the overviews — upload nothing, change
+- **Standard (default):** find and upload the missing receipts
+  (step 1), offer the audit of pre-existing receipts (step 2 — the user
+  decides), close with the wrap-up (step 3). The five matching criteria
+  are the safety gate — anything below high confidence is never
+  uploaded, only reported or asked about. And uploads never happen
+  silently: nothing reaches Qonto before the user confirms the
+  overview, and every run ends with the wrap-up.
+- **Dry-run:** hunt and show the overviews — upload nothing, change
   nothing. Use it when the user only asks where receipts are missing or
   wants a preview first ("dry run", "nur anzeigen").
 - **Scheduled runs** have nobody to confirm: they follow what was agreed
-  when the routine was created (auto-upload high-confidence matches, or
-  report-only) and always end with the final overview.
+  when the routine was created (auto-upload high-confidence matches or
+  report-only, audit on or off) and always end with the wrap-up.
 
 ## Workflow
 
@@ -206,18 +204,18 @@ is Merlin's — phrase it fresh, in his voice, differently every run.
 the run moving:
 
 - **Say where you are.** Every substantive message during the run opens
-  with its station — step number plus a few words ("Step 2/4 — hunting
+  with its station — step number plus a few words ("Step 1/3 — hunting
   your inbox"). The numbering is fixed by this workflow, the wording is
   Merlin's — and let the found-receipts count tick upward along the
   way: small wins, visibly counted, keep the energy up.
 - **Few pause points, bulk decisions.** The run waits for user input
   exactly at: the opener questions (month, name, language), the upload
-  confirmation in step 3, and step 4's hand-offs (browser setup, portal
-  logins, receipts handed over in the chat, removal approvals).
-  Everywhere else Merlin keeps driving on his own. A run never ends
-  while receipts are still open unless the portal route was tried or
-  explicitly declined — the finish line is step 4's final overview plus
-  the offboarding, nothing earlier.
+  confirmation in step 1, the audit question in step 2, and the
+  wrap-up's hand-off (receipts dropped in the chat, removal approvals).
+  Everywhere else Merlin keeps driving on his own. The run ends only
+  after the wrap-up was delivered — and skipping the hand-off is a
+  valid answer (those rows count as "not provided"), never a reason to
+  stall or to nag.
 
 **Scope: month and user.** Settle the month (see "Month argument"). And
 know **who you're talking to**: if the name isn't already known — from earlier turns, memory, or
@@ -238,11 +236,12 @@ never guess.
 
 **Fetch the month from Qonto.** `get_organization` for the bank account
 ids, then `list_transactions` per account over the reconciliation
-window. Transactions **with** attachments feed the audit (step 1); a
-transaction is **missing** its receipt iff `attachment_required == true`
-and `attachment_ids` is empty and `status == "completed"` — those feed
-the hunt (step 2). Capture the card holder / initiator per transaction
-where Qonto provides one — it drives the grouping in step 4.
+window. A transaction is **missing** its receipt iff
+`attachment_required == true` and `attachment_ids` is empty and
+`status == "completed"` — those feed step 1. Transactions with
+pre-existing attachments feed the optional audit (step 2). Capture the
+card holder / initiator per transaction where Qonto provides one — it
+drives the grouping in the wrap-up.
 
 **No-receipt list.** Exclude transactions where no third-party invoice
 exists — they must not eat candidates, and never search or ask for a
@@ -265,53 +264,14 @@ over time:
   outgoing invoice, not an inbound receipt — count them separately, never
   match candidates against them.
 
-Count them under "Skipped" in the final overview (step 4), per category,
-so the user sees what was deliberately left alone.
+Count them under "Skipped" in the wrap-up (step 3), per category, so the
+user sees what was deliberately left alone.
 
-### 1. Audit what's already attached
-
-Before hunting anything new, verify what already exists — a wrong
-attachment discovered now gets fixed in the same run, with no extra
-round for the user:
-
-1. Fetch the month's transactions with non-empty `attachment_ids`, pull
-   each attachment (`list_transaction_attachments` / `get_attachment`;
-   download in parallel batches of ~5) and extract amounts, vendor,
-   dates, and document type from the PDF.
-2. Validate each attachment against its own transaction with the
-   matching rules (below): amount in account or local currency, vendor,
-   date window, document type. Also flag the same document attached to
-   more than one transaction.
-3. Classify:
-   - **Looks right** — a count in the final overview, no detail needed.
-   - **Looks wrong** — flag it with the concrete reason ("attachment
-     says 49.00 €, transaction is 13.42 €") and **add the transaction
-     to the hunt of step 2**: Merlin hunts the correct invoice
-     himself, so the fix costs the user one decision, not one errand.
-   - **Not an invoice** (contract, official notice, delivery note, a
-     collective invoice spanning several charges, …) — inform, don't
-     judge: deliberate attachments are common, and a collective invoice
-     legitimately fails the per-transaction amount check.
-4. Fixes ride the normal flow: proposed **replacements** (remove the
-   wrong attachment, attach the right one) appear in the upload
-   overview (step 3), clearly marked as replacements, and run with the
-   same single confirmation. Flags that stay unresolved land in step
-   4's "Please review" section with their reason. **Removal without a
-   replacement** is asked about separately and explicitly — after
-   saying clearly that the transaction then counts as missing its
-   receipt again and that removal cannot be undone from here. Never
-   remove or replace anything the user hasn't approved; when in doubt,
-   leave it attached and flag it. Scheduled runs never fix — they only
-   report suspicions. The audit also works standalone on request:
-   "prüfe die hochgeladenen Belege", "audit receipts", "stimmen die
-   Belege?".
-
-### 2. Hunt the missing invoices (parallel)
+### 1. Find and upload the missing receipts
 
 Work through the search pool — every receipt-less transaction that
-survived the no-receipt list, plus those step 1 flagged for
-replacement — and hunt their invoices in the connected mailboxes, inbox
-and archive. Search window: the charge month
+survived the no-receipt list — and hunt their invoices in the connected
+mailboxes, inbox and archive. Search window: the charge month
 **plus the entire previous month**, and a few days past month end —
 subscriptions invoice on the charge day, but transfers and direct debits
 pay invoices that arrived days or weeks earlier. If a transfer's invoice
@@ -328,9 +288,12 @@ downloading via shell, as concurrent jobs, e.g. `xargs -P 5`). Batch about
 individually before giving up on that candidate.
 
 For each PDF, extract: all monetary amounts with currency and surrounding
-context, invoice/billing dates, sender address, and subject. With several
-mailboxes connected, collect from all of them and dedupe on the RFC
-message id.
+context, invoice/billing dates, **the invoice number**, sender address,
+and subject. With several mailboxes connected, collect from all of them
+and dedupe twice: on the RFC message id, and on content — the same
+invoice often arrives as several copies (forwarded, CC'd into a second
+inbox); identical file hashes or identical invoice numbers are **one**
+candidate, never two.
 
 #### Matching rules — the gate for every upload
 
@@ -352,13 +315,20 @@ must hold** for a high-confidence match:
 | **5 · Uniqueness** (hard gate) | Exactly **one** candidate survives criteria 1–4 for this transaction, and that candidate fits no other open transaction (except the duplicate-charge case below). Two PDFs that both fit one transaction — or one PDF that fits two transactions — is not a match, it's a question for the user. |
 
 - **High confidence** (uploaded in standard mode once the user confirms
-  the upload overview, step 3): all five criteria ✓.
+  the upload overview below): all five criteria ✓.
 - **Review** (report or ask, never auto-upload): amount ✓ but any other
   criterion fails or cannot be decided from the document.
 - Duplicate charges (e.g. three identical debits from one vendor on one day):
   assign distinct PDFs 1:1 by closest date; if there are fewer invoices than
   transactions the remainder stays open. Never attach the same PDF to two
   transactions.
+- **One invoice, one transaction.** An invoice number ends up attached
+  to at most one transaction: check every candidate's invoice number
+  against the other proposals of this run — a second copy of the same
+  invoice is never a match for a similar transaction, it's a "Please
+  review" row. The audit (step 2), when it runs, additionally flags the
+  same document attached to more than one transaction — including
+  against what this run just uploaded.
 - Prefer amounts whose context reads like a total ("Total", "Gesamtbetrag",
   "Amount due") over line items when several candidates tie.
 - Same-price subscriptions match several months' invoices on amount alone.
@@ -378,10 +348,10 @@ Tell them apart by their features, not the filename:
 When both exist, attach the invoice and drop the receipt — never both.
 When only a receipt is found and no invoice candidate exists for that
 charge, attach the receipt: better than nothing. All other criteria
-(amount, vendor, date, uniqueness) apply unchanged, and the report flags
-it — "receipt attached; proper invoice likely in the vendor portal" — so
-the user can swap it later, since receipts often lack the tax details an
-accountant needs. A receipt that references invoice number N is also
+(amount, vendor, date, uniqueness) apply unchanged, and it is flagged in
+the upload overview and wrap-up — "receipt attached; proper invoice
+likely in the vendor portal" — so the user can swap it later, since
+receipts often lack the tax details an accountant needs. A receipt that references invoice number N is also
 strong evidence for which charge invoice N belongs to — useful for
 matching either way.
 
@@ -390,27 +360,27 @@ two plausible candidates, an unreadable billing period, invoice-or-receipt
 doubt — and the user is present, ask a concrete question naming the
 specific options ("Transaction of 13.42 € on Jul 3: candidate A or B?")
 before any upload; collect all questions and ask them together with the
-upload overview (step 3) instead of one at a time. If nobody can answer
+upload overview (below) instead of one at a time. If nobody can answer
 (scheduled or otherwise non-interactive run), leave the transaction open
-and explain the ambiguity in the final overview. A skipped upload is
-always the better error.
+and explain the ambiguity in the wrap-up's "Please review" section. A
+skipped upload is always the better error.
 
-### 3. Upload overview — confirm, then upload
+#### Upload overview — confirm, then upload
 
 Show **one table** that makes every planned upload traceable at a
 glance: per row the transaction (date, amount, vendor) and the receipt
 that will be attached to it (email subject and/or invoice title).
-Replacements from step 1 are part of the same table, clearly marked
-(what hangs there now, why it's wrong, what replaces it). Tables are the
-default for every overview in this workflow — skimmable columns beat
-prose lists. Ask the batched questions from "Unclear cases" here as
-well.
+Tables are the default for every overview in this workflow — skimmable
+columns beat prose lists. Ask the batched questions from "Unclear
+cases" here as well.
 
 **State explicitly that nothing has been uploaded yet**, then ask the
-one bulk question: any changes, or upload everything as shown? After the
-go, upload (see "Upload mechanics") and **confirm to the user once
-everything is up**, with the count. In dry-run, stop here: show the
-table, upload nothing.
+one bulk question: any changes, or upload everything as shown? If the
+user asks for changes, apply them and upload the rest — no second full
+round unless they want one. After the go, upload (see "Upload
+mechanics") and **confirm to the user once everything is up**, with the
+count. In dry-run: show the table, upload nothing, and continue
+straight to the wrap-up.
 
 #### Upload mechanics
 
@@ -435,70 +405,99 @@ concurrently (`xargs -P 5` or shell background jobs with `wait`), then the
 step 3. If one match fails mid-chain, finish the others and report the
 failure; don't abort the batch.
 
-### 4. What's left — one final overview, then help clearing it
+### 2. Audit the pre-existing receipts — the user decides
 
-Everything still open lands in **one table with two sections**, so the
-user can work it off in bulk instead of piecemeal:
+After the upload round, ask **one question, one line, in character**:
+should Merlin also verify the receipts that were **already attached
+before this run**? Recommend it — a wrong receipt corrupts the books
+silently — and accept a "no" without pushing: then head straight to the
+wrap-up.
+
+If the user says yes:
+
+1. Pull the pre-existing attachments (`list_transaction_attachments` /
+   `get_attachment`; download in parallel batches of ~5) and extract
+   amounts, vendor, dates, document type, and invoice number from each
+   PDF.
+2. Validate each attachment against its own transaction with the
+   matching rules. Also flag the same document attached to more than
+   one transaction — including against what this run just uploaded.
+3. Classify: **looks right** — a count in the wrap-up, no detail
+   needed. **Looks wrong or can't be fully validated** — a "Please
+   review" row with the concrete, plain-language reason ("attachment
+   says 49.00 €, transaction is 13.42 €"). **Not an invoice** (a
+   contract, an official notice, a collective invoice spanning several
+   charges, …) — inform, don't judge: deliberate attachments are
+   common, and a collective invoice legitimately fails the
+   per-transaction amount check.
+4. Fixes only on the user's explicit ask, per item or as a confirmed
+   batch: **replace** (on request Merlin hunts the correct invoice in
+   the inbox, removes the wrong attachment, uploads the right one) or
+   **remove** — after saying clearly that the transaction then counts
+   as missing again and that removal cannot be undone from here. When
+   in doubt, leave it attached and flag it. Scheduled runs never fix —
+   they only report.
+
+The audit also works standalone on request: "prüfe die hochgeladenen
+Belege", "audit receipts", "stimmen die Belege?".
+
+### 3. Wrap-up
+
+Everything still open lands in **one table with two sections** — the
+user sees the full state and works it off in bulk, never piecemeal:
 
 - **Missing receipts** — transactions (not excluded) that still have no
-  receipt, grouped by who owes it: the user's own payments ("your
-  card" — attributed by identity, see "Scope"), payments without any
-  holder attribution ("no assignment"), then everyone else per name.
-  Per row a hint where the receipt likely lives (vendor portal, paper
-  receipt for card payments, a colleague's inbox).
-- **Please review** — the transactions flagged by the audit (step 1)
-  plus review-grade matches and unresolved questions, each with a
-  short, plain-language reason why a human should look ("attachment
-  says 49.00 €, transaction is 13.42 €").
+  receipt, **with the card holder wherever Qonto provides one**,
+  grouped by who owes it: the user's own payments ("your card" —
+  attributed by identity, see "Scope"), payments without any holder
+  attribution ("no assignment"), then everyone else per name. Per row a
+  hint where the receipt likely lives (vendor portal, paper receipt for
+  card payments, a colleague's inbox).
+- **Please review** — the audit's findings plus review-grade matches
+  and unresolved questions: something is already attached here, but it
+  couldn't be validated one hundred percent — each row with its short,
+  plain-language reason.
 
-Before presenting the table, shrink it: for portal-hosted invoices,
-re-check explicitly for the surface's matching Chrome integration —
-**Claude in Chrome** on Claude surfaces, the built-in **Chrome** plugin
-on Codex (details: Step 3 of `fizard-onboard`); a lookalike browser MCP
-doesn't count. If it's missing, ask once, by name, whether to set it up
-now — **including the Chrome extension** — and say what that means in
-Merlin's words: he can then visit the portals, drive the browser, and
-download the missing invoices himself, in parallel where the portals
-allow it — while **passwords never pass through him**: any login stays
-the user's move, Merlin only drives the session that is already open.
-If the user declines, skip without pushing. Every fetched PDF goes
-through the matching rules and the upload path like any other
-candidate, and the progress updates keep coming as receipts land.
+Then one hand-off, one bulk moment, never a nag-loop: the user can
+**drop the remaining receipts right here in the chat** — any subset,
+all at once; Merlin validates each against the matching rules and
+uploads what passes, same strictness as always, and a file that matches
+no open transaction is called out, never force-attached — or upload in
+Qonto themselves, or simply move on. Providing nothing, for some rows
+or for all of them, is a **valid answer and never breaks the run**:
+whatever ends the hand-off without a receipt counts as **not
+provided**, full stop, no chasing. In scheduled runs there is nobody to
+hand anything over — skip the hand-off.
 
-Then invite the bulk hand-off: the user can **drop the remaining
-receipts right here in the chat** — Merlin validates each against the
-matching rules and uploads what passes, same strictness as always — or
-upload them in Qonto themselves. Whatever is still open afterwards is
-the only backlog, owned by the names in the table.
-
-Close with the bottom line, in the user's language — also in scheduled
-runs; work never happens silently:
+Close with the bottom line — every run, also scheduled ones; work never
+happens silently. It summarizes the final state after the hand-off, in
+the user's language:
 
 ```
 **▓▓▓▓▓▓▓▓░░  12/15 receipts done — 3 to go**
-Uploaded this run: N · Missing: N · Please review: N ·
-Skipped (no-receipt list): counts per category · Audit: N ok / M flagged
+Uploaded this run: N · Not provided: N · Please review: N ·
+Skipped (no-receipt list): counts per category · Audit (if run): N ok / M flagged
 ```
 
-The progress line is the gamification: of all receipt-requiring
+List the not-provided and please-review rows once more, compactly —
+they are the only backlog, owned by the names from the table. The
+progress line is the gamification: of all receipt-requiring
 transactions in the month (after the no-receipt list), how many are
 complete — receipts that already existed plus what this run uploaded —
 versus how many are still missing, as a bar with plain numbers.
 Reaching 100% is the win state and earns Merlin's genuine celebration;
 anything below names exactly how many are left to go.
 
-Everything from here on is the offboarding — start it once the user
-cannot upload anything further.
-
 After the summary, close in character (see "Personality"): one line —
 specific praise when the month is clean or nearly clean, a pointed,
 friendly push naming the next concrete action when receipts are still
 open. Never pad the summary itself.
 
-When everything is done — matches uploaded, nothing left for the user to
-decide — add one more short line inviting improvement suggestions and
-ideas to **marc@fizard.com** (they land directly with the maker). One
-line, in character, never pushy; skip it when open items remain.
+The wrap-up also carries the remaining info, whatever the month's
+state: add one short line inviting improvement suggestions and ideas to
+**marc@fizard.com** (they land directly with the maker). One line, in
+character, never pushy — the run is done for today whether or not every
+receipt made it.
 
 If the connected email tooling can send or draft mail, offer to deliver
 the feedback right from here: the user provides the text, you compose the
@@ -515,15 +514,17 @@ of day** before creating anything; suggest as default: monthly, a few days
 after month end (e.g. the 5th at 09:00), reconciling the previous month,
 since invoices often trickle in late. Create the routine exactly as
 answered. Scheduled runs cannot ask for confirmation — agree upfront
-whether the routine may auto-upload high-confidence matches or should run
-report-only; either way every scheduled run ends with the report. If a
-routine already exists or the surface cannot schedule, skip this
+whether the routine may auto-upload high-confidence matches or should
+run report-only; either way every scheduled run ends with the wrap-up.
+If a routine already exists or the surface cannot schedule, skip this
 entirely.
 
 ## Known limits
 
 - Link-only receipts (Stripe receipt links, portal-download invoices from
-  Google, Apple, and similar) never arrive as PDF attachments — they
-  surface in the missing-receipts section and are exactly what the
-  portal assist in step 4 is for. Without browser access, name the
-  vendor portal so the user knows where to download manually.
+  Google, Apple, and similar) never arrive as PDF attachments — they land
+  under "Missing receipts" with the vendor portal named, so the user
+  knows where to download manually (and can drop the file straight into
+  the chat). Fetching them from the portals automatically is
+  **deliberately out of scope** for this skill — that becomes its own
+  Fizard skill.
