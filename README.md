@@ -15,7 +15,10 @@ then get every update automatically (or with one command).
 
 To receive updates automatically: `/plugin` → **Marketplaces** tab →
 select `fizard` → **Enable auto-update**. Or update manually any time with
-`/plugin marketplace update fizard`.
+`/plugin marketplace update fizard`. Auto-update refreshes the catalog in
+the background; if a session still reports an older installed version —
+the skill's self-update check watches for exactly this — bring it current
+with `claude plugin update qonto-matchmaker@fizard`.
 
 **Using the desktop app?** The `/plugin` command is terminal-only. Run the
 same thing once in any terminal instead — the plugin is then available
@@ -48,26 +51,24 @@ with `npx skills update`.
 
 ### Qonto Matchmaker by Fizard (`qonto-matchmaker`)
 
-The matchmaker between your inbox and your bank account: finds Qonto
-transactions with missing receipts, matches invoice PDFs from your email
-inbox against them (exact amount, vendor, date — and only when the match
-is unambiguous), attaches confident matches automatically via the Qonto
-MCP, and ends every run with a progress report: what's done, what's
-missing (and whose card it was), where to find the rest. On request it
-also audits the receipts already attached — fixes happen only ever with
-your approval.
+The matchmaker between your inbox and your bank account: it finds Qonto
+transactions with missing receipts, matches invoice PDFs from your
+email against them (exact amount, vendor, date — and only when the
+match is unambiguous), and attaches confident matches via the Qonto MCP
+after one bulk confirmation. Every run ends with a progress report:
+what's done, what's missing (and whose card it was), where to find the
+rest. On request it also audits the receipts already attached — fixes
+only with your approval.
 
-Fair warning: it has a personality, and his name is **Merlin**. Think
-best friend with a mission — he makes receipt-chasing fun, doesn't mince
-words when receipts sit open for months, and celebrates you when the
-month is clean. All in service of one goal: books your accountant can
-close without a single follow-up question.
+*Qonto Matchmaker is an independent Fizard product — not affiliated with
+or endorsed by Qonto.*
 
 **Qonto connection is bundled:** the plugin ships the Qonto MCP server
 config (`https://mcp.qonto.com/mcp`); on first use you just log in to Qonto
 once (Claude Code: `/mcp` → qonto → authenticate). Already using the Qonto
-MCP? Nothing changes — the bundled config is deduplicated against your
-existing connection, which keeps working as-is.
+MCP — your own server entry or the claude.ai connector? It keeps working
+as-is: the bundled server runs alongside it, and the skills use whichever
+Qonto connection is authenticated (preferring the bundled one).
 
 **Email access you connect yourself**, depending on what you use:
 
@@ -89,15 +90,15 @@ moment that ships.
 **Getting started:** run `/reconcile-invoices <Monat>` (e.g.
 `/reconcile-invoices Juni` — the month is always read in the current year)
 or just ask *"Wo fehlen Belege?"*. On first use (or whenever a connection
-is missing) Merlin runs the onboarding first: Qonto connection, email
-connector, optional browser setup.
+is missing) the onboarding runs first: Qonto connection, email connector,
+optional browser setup.
 
 ## Feedback
 
 Ideas and improvement suggestions are always welcome — send them to
-[marc@fizard.com](mailto:marc@fizard.com). Or just tell Merlin: if your
-connected mailbox can send mail, he'll compose the message for you and
-send it once you've approved the text.
+[marc@fizard.com](mailto:marc@fizard.com), or hand them over in a
+session: if your connected mailbox can send mail, the plugin composes
+the message for you and sends it once you've approved the text.
 
 ## Release workflow (Fizard-internal)
 
@@ -109,8 +110,10 @@ send it once you've approved the text.
    Codex caches by manifest version and needs the bump to pick up changes.
 3. Add a `CHANGELOG.md` entry under the new Codex version.
 4. `claude plugin validate .claude-plugin/marketplace.json`, then commit and
-   push to `main`. Claude clients with auto-update get the new state on their
-   next start; Codex and skills-CLI clients on their next manual update.
+   push to `main` — CI re-runs the validation and checks that the Codex
+   manifest version matches the changelog head. Claude clients with
+   auto-update get the new state on their next start; Codex and skills-CLI
+   clients on their next manual update.
 
 ## Structure
 
@@ -125,6 +128,7 @@ plugins/qonto-matchmaker/
     ├── fizard-onboard/SKILL.md          onboarding flow
     └── reconcile-invoices/SKILL.md      the monthly reconciliation
 CHANGELOG.md                             what changed per release
+.github/workflows/validate.yml           CI: manifest validation + version check
 ```
 
 Both plugin systems expect `skills/` at the plugin root, so a single plugin

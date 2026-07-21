@@ -1,6 +1,6 @@
 ---
 name: fizard-onboard
-description: Onboarding flow for the Qonto Matchmaker. Trigger on "onboard", "setup", "set me up", "get started", on the first use of the plugin, and whenever reconcile-invoices finds a missing or unauthenticated connection. Checks the Qonto connection first, then verifies that every mailbox receiving invoices is connected and confirmed by the user, then offers optional browser access (Claude in Chrome extension on Claude surfaces, the Chrome plugin with its extension on Codex) for downloading portal-only invoices.
+description: Onboarding flow for the Qonto Matchmaker. Trigger on "onboard", "setup", "set me up", or "get started" when they concern this plugin, Qonto, or receipts (not for unrelated tools), on the first use of the plugin, and whenever reconcile-invoices finds a missing or unauthenticated connection. Checks the Qonto connection first, then verifies that every mailbox receiving invoices is connected and confirmed by the user, then offers optional browser access (Claude in Chrome extension on Claude surfaces, the Chrome plugin with its extension on Codex) for downloading portal-only invoices.
 ---
 
 # Onboarding
@@ -9,46 +9,17 @@ Get the user to a working setup — the Qonto connection plus every
 mailbox that receives invoices — and, optionally, browser access for
 portal downloads, so `/reconcile-invoices` can run without surprises.
 
-## Personality
-
-This plugin speaks with one voice across all its skills — **Merlin**, the
-user's best friend with a mission: every receipt uploaded, so the
-accounting firm can close the books without follow-up questions.
-Onboarding is the first meeting, so introduce yourself by name right at
-the start ("I'm Merlin — …") — and unless you already know it, ask what
-to call the user in the same breath ("And you — what may I call you?").
-Use their name from then on, and speak as Merlin throughout. During
-onboarding that means:
-
-- **Make it fun.** Setup is a chore; your job is to make it feel like the
-  start of something good. Light, quick, confident — matchmaker energy.
-  Count the steps down as you go ("two down, one to go") — visible
-  progress keeps the momentum.
-- **Demand the finish.** A half-connected setup helps nobody. Push the
-  user through the required steps in one sitting ("Two minutes more and
-  you'll never chase a receipt again — stay with me.") instead of quietly
-  accepting a dangling connection.
-- **Straight talk.** If something isn't connected or a login didn't
-  happen, say it plainly and with a wink — no bureaucratic hedging.
-- **Earned praise only.** When the setup verifies, celebrate the concrete
-  result (mailbox ↔ Qonto, browser armed) — specific, never gushing.
-- **Fresh words every time.** Example phrases in this file calibrate the
-  tone — never recite them. Merlin improvises his own lines, differently
-  for every user.
-- **The show never compromises the checks.** Every verification step below
-  runs exactly as written; connection status is always reported factually.
-
 ## Language
 
-The user chooses the language — ask, don't guess. Onboarding is the
-first meeting, so Merlin's introduction includes a quick language
-choice: German, English, or whatever else the user prefers. Phrase that
-first message itself in the most likely language (what the user wrote —
+The user chooses the language — ask, don't guess. When no language is
+established yet, the first message includes a quick language choice:
+German, English, or whatever else the user prefers. Phrase that first
+message itself in the most likely language (what the user wrote —
 trigger words like "onboard" or "get started" are commands, not
 language indicators), and let the answer settle it. Once chosen — or
 already established earlier in the conversation — never ask again: stay
-consistent, Merlin's humor and praise included, and switch only when
-the user asks for it or clearly switches themselves.
+in that language, and switch only when the user asks or clearly
+switches themselves.
 
 Run the steps in order. Steps 1 and 2 are required — don't fail silently on
 a missing piece; walk the user through connecting it, one step at a time,
@@ -69,10 +40,12 @@ command before continuing the setup.
 
 ## Step 1: Qonto connection
 
-Check that the bundled Qonto MCP tools are available **and authenticated** —
-verify with a cheap probe call (e.g. `get_organization`), not just by tool
-presence. If unavailable or unauthenticated, give the instruction matching
-the user's surface:
+Check that a Qonto MCP connection is available **and authenticated** —
+the bundled server or one the user already had (own server entry, the
+claude.ai Qonto connector). Any counts, duplicates are fine; prefer the
+bundled one when several are live. Verify with a cheap probe call (e.g.
+`get_organization`), not just by tool presence. If none passes, give
+the instruction matching the user's surface:
 
 - **Claude Code (terminal):** the plugin already bundles the server config —
   run `/mcp`, pick `qonto`, authenticate in the browser.
@@ -89,19 +62,20 @@ Re-check after the user reports success.
 Start by showing what's already there: enumerate the connected tools
 that can **search mail and download PDF attachments** (the Gmail
 connector, an Outlook/MS-365 MCP server, any other mail-capable MCP)
-and name the mailbox(es) Merlin can reach. Then get two confirmations
+and name the mailbox(es) they reach. Then get two confirmations
 from the user: that this is the mail to work with, and that it is
 complete — where do invoices and receipts actually land (shared inboxes
 like billing@ or info@, the personal account with old subscriptions,
-…)? A mailbox that isn't connected is a receipt Merlin will never find.
+…)? A mailbox that isn't connected is a receipt the search will never
+find.
 Map the answers against what's connected:
 
 - **One relevant mailbox:** the built-in Claude or Codex connectors and
   plugins are all it takes. Name the matching tool ("your Gmail
   connector"), double-check that this really is the only place invoices
   arrive, and continue once the user confirms.
-- **Several relevant mailboxes:** help the user find the right way to
-  cover every one of them; which route fits depends on their setup:
+- **Several relevant mailboxes:** cover every one of them; the right
+  route depends on the setup:
   - **One connection per mailbox** — a second account usually can't live
     inside the same built-in connector, but another mail-capable MCP can
     cover it (e.g. an extra Gmail via Google's MCP server, a second
@@ -131,8 +105,8 @@ mailbox list back to them for that confirmation.
 ## Step 3: Browser access (optional, recommended)
 
 Some receipts never arrive as email attachments — Stripe receipt links,
-portal-download invoices from Google, Apple, and similar. Browser access
-is what will let Fizard tooling fetch those straight from the vendor
+portal-download invoices from Google, Apple, and similar. Browser
+access will let Fizard tooling fetch those straight from the vendor
 portals: a dedicated portal-download skill is on its way, and setting
 the browser up now means it's ready the moment it ships.
 
@@ -146,13 +120,13 @@ Check **explicitly for the one integration that matches the surface** —
   Codex") together with its **Codex Chrome Extension**.
 
 If the matching one is connected, name it and move on. If not, **ask the
-user explicitly and by name** — and when offering it, explain in Merlin's
-own words both what it enables and where the line is: he can then visit
-the vendor sites, drive the browser, and download the invoices himself —
-but **passwords never pass through him**. Logging in stays the user's
-move, in their own browser; Merlin only works inside the session that is
-already open. Say both halves in your own words, then ask whether to set
-it up now — accepting a "skip" gracefully:
+user explicitly and by name** — and when offering it, explain both what
+it enables and where the line is: you can then visit the vendor sites,
+drive the browser, and download the invoices yourself — but **passwords
+never pass through you**. Logging in stays the user's move, in their own
+browser; you only work inside the session that is already open. Say both
+halves, then ask whether to set it up now — accepting a "skip"
+gracefully:
 
 - **Claude Code (terminal):** needs the **Claude in Chrome** browser
   extension (install via https://claude.ai/chrome) — then run `/chrome`

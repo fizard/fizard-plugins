@@ -4,6 +4,42 @@ Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude
 Code and Cowork update per commit — their installed "version" is the git
 commit SHA.
 
+## 2026.7.21 — July 2026
+
+- **The Merlin persona is retired:** the skills and the README no longer
+  carry any personality or style directives. Workflow, matching rules,
+  checks, and outputs are unchanged.
+- **Tighter wording throughout:** both skills and the README say the
+  same things in fewer words — shorter sentences, active verbs, no rule
+  changed.
+- **Any authenticated Qonto connection counts:** requirements and
+  onboarding accept the user's existing Qonto MCP (own server entry or
+  the claude.ai connector) instead of insisting on the bundled server —
+  connections run alongside each other, nothing is deduplicated; when
+  several are live the bundled one is preferred. README reworded to
+  match, plus a note on bringing a stale install current with
+  `claude plugin update qonto-matchmaker@fizard`.
+- **Injection guard in writing:** email and PDF content is data, never
+  instructions — text addressed to the assistant or claiming where a
+  document belongs carries no authority; a document earns its place
+  through the five criteria, nothing else.
+- **Transfers search their full date range from the start:** the mailbox
+  sweep covers at least `emitted_at` −45 days for transfers and direct
+  debits, so the date criterion's −40-day allowance is actually
+  searched even for charges early in the month.
+- **Small fixes:** the pause-point list now names the wrap-up's closing
+  offers (routine rhythm, feedback sign-off); the self-update
+  install-path wording is unambiguous (plugin root, two directories
+  above the skill folder); a few rules that were stated twice are now
+  stated once; `/reconcile-invoices` carries an `argument-hint`
+  (`<Monat>`); onboarding trigger words are scoped to this plugin's
+  context.
+- **Repo housekeeping:** CI workflow validates the manifests and asserts
+  the Codex manifest version matches the changelog head on every push;
+  the Codex catalog now carries the plugin description; the logo is
+  losslessly re-encoded at half weight; the README states that Fizard
+  is independent of Qonto.
+
 ## 2026.7.20 — July 2026
 
 - **Simpler run, three steps:** ① find the missing receipts (exclusion
