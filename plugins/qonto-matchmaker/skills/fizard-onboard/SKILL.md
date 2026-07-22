@@ -24,7 +24,8 @@ identify the host surface. Continue only in a **local Claude Code CLI/desktop
 Code session**, a **Claude Cowork task with this plugin active**, or the
 **Codex app/CLI**. On any other or unidentified surface, direct the user to one
 of these three paths and stop without network calls, setup, authentication, or
-data access. Cowork still has to pass every capability below.
+data access. Cowork must still pass every read capability required for its
+limited workflow below.
 
 In Cowork, continue only in an interactive task that the user started directly
 with **Manually approve**. Otherwise, tell the user to start such a task and
@@ -133,11 +134,9 @@ Provider guidance:
 - **Outlook / Microsoft 365:** on either supported host, use an integration
   only when the same attachment probe succeeds. Published search support is
   not proof of PDF download.
-- **Community MCPs:** do not install or recommend a command from this v1
-  onboarding flow. Registration differs by surface, mail presets may omit
-  shared-mailbox tools, and new packages have not been audited by Fizard. If
-  the user already operates an independently reviewed connector, subject it
-  to the same read-only PDF probe; otherwise use limited mode.
+- **Third-party mail connectors:** accept an existing connector only when the
+  user or their organization has reviewed it. Apply the same read-only PDF
+  probe. Otherwise use limited mode.
 
 Then map every address where invoices arrive — personal inboxes, billing@,
 info@, old subscription accounts, delegated/shared mailboxes — to a verified
@@ -155,10 +154,8 @@ request an upload URL during this probe. This proves availability, not an
 end-to-end upload; the first explicitly approved live upload is the first full
 proof of that route.
 
-Cowork is limited to read-only reporting and manual-file validation in this
-release. Fizard has not yet release-tested and allowlisted Qonto's complete
-signed-upload route from Cowork. In Cowork, do not request an upload URL, call
-an upload tool, or PUT a file. Identify the transaction and tell the user to
+Cowork uses report and manual-file mode. Do not request an upload URL, call an
+upload tool, or PUT a file. Identify the transaction and tell the user to
 attach the validated PDF in Qonto.
 
 ### Honest fallback

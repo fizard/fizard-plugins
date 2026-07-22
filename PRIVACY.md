@@ -22,8 +22,8 @@ Data is processed by the services and execution environment the user chooses:
 - GitHub for the plugin's best-effort version check and updates.
 
 Those providers' privacy, retention, regional-processing, and administrator
-policies apply independently. A community MCP server is an additional third
-party chosen by the user and is not operated or audited by Fizard.
+policies apply independently. Any third-party mail connector the user chooses
+is another independent provider.
 
 Cowork tasks run in an isolated execution environment on Anthropic's servers.
 Its shell, temporary files, and remote connectors are therefore processed in
@@ -49,18 +49,15 @@ as secrets and must not be printed to the user or added to unnecessary logs.
 
 ## Writes and user control
 
-In an interactive standard run, Qonto receives an attachment only after the
-user sees the proposed mapping and explicitly approves the upload. This upload
-path is currently available only in supported Claude Code and Codex sessions.
-Cowork is limited to read-only reporting and manual-file validation; it does
-not upload to Qonto. Dry-runs and scheduled runs are report-only. The plugin
-does not send email feedback without the user's separate approval and never
-sends it from Cowork.
+In an interactive Claude Code or Codex run, Qonto receives an attachment only
+after the user sees the proposed mapping and approves the upload. Cowork reads
+Qonto and validates user-supplied files; the user uploads the file in Qonto.
+Dry-runs and scheduled runs produce reports only. Email feedback requires a
+separate approval. Cowork shows the support address instead.
 
-Qonto work in Cowork requires a directly started interactive task with
-**Manually approve**. The plugin stops before data access in Auto, Skip,
-scheduled, unattended, or mobile-dispatched Cowork tasks. It does not use
-Computer Use, Claude in Chrome, or direct Qonto or mail interfaces.
+Qonto work in Cowork begins only in a directly started task with **Manually
+approve**. The workflow uses declared connectors, attached files, and Cowork's
+isolated shell. It does not drive the Qonto or mail interface.
 
 Authentication credentials are handled by the selected surface, connector,
 and Qonto OAuth flow; the plugin does not ask the user to reveal a password.

@@ -1,7 +1,7 @@
 {
   "name": "qonto-matchmaker",
   "displayName": "Qonto Matchmaker by Fizard",
-  "description": "Finds missing Qonto receipts. With attachment-capable email, Claude Code and Codex match and upload approved PDFs; Cowork validates files for manual upload.",
+  "description": "Finds missing Qonto receipts. When the mail connector returns PDF files, Claude Code and Codex validate matches and upload them after user approval. Cowork validates attached PDFs for manual upload.",
   "author": {
     "name": "Fizard",
     "email": "support@fizard.com"

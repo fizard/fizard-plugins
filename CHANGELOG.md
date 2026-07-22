@@ -3,15 +3,26 @@
 Versions follow the Codex manifest (`.codex-plugin/plugin.json`). Claude Code
 and Cowork update per commit — their installed "version" is the git commit SHA.
 
+## 2026.7.23 — July 2026
+
+- **One writing standard:** `AGENTS.md` now holds the shared rules for
+  accuracy, tone, and concise writing. `CLAUDE.md` imports that file instead of
+  copying it.
+- **Final copy pass:** the README, privacy notice, store descriptions, skills,
+  and Notion guide now lead with the action, cut repetition, and describe the
+  available paths directly.
+- **Four logic fixes:** Cowork probes only the reads its manual workflow needs.
+  Duplicate-debit date ties resolve only to one unique mapping. Manual evidence
+  decisions stay in the row ledger. External-contractor wording no longer
+  makes an accounting claim.
+- **Stronger release check:** the validator now requires both instruction
+  files and one canonical description across the catalogs and manifests.
+
 ## 2026.7.22 — July 2026
 
-- **Leaner run — audit paused:** the audit of pre-existing receipts is
-  removed for now (it may return later). A run is: find, confirm,
-  upload, wrap up. "Please review" keeps this run's own unclear
-  matches.
-- **Leaner onboarding — browser step paused:** onboarding is Qonto and
-  mail; the Chrome setup may return together with the portal-download
-  skill.
+- **Receipt audit removed:** a run now finds, confirms, uploads, and wraps up.
+  **Please review** keeps this run's unclear matches visible.
+- **Onboarding covers Qonto and mail:** Chrome setup moved out of this plugin.
 - **The user gives the go:** both skills open by naming the steps ahead
   and start only after the okay. Mid-run detours return to the named
   next step — every substantive message closes with what comes next.
@@ -23,11 +34,11 @@ and Cowork update per commit — their installed "version" is the git commit SHA
   prerequisites. It does not call a route live-tested until its first approved
   upload. Metadata-only Gmail routes fall back to a concrete report/manual
   path.
-- **Honest store and privacy boundaries:** marketplace copy now advertises
-  attachment-dependent automation plus limited mode, unaudited community
-  mail-server installation is no longer guided, and `PRIVACY.md` documents
-  provider processing, best-effort temp cleanup, and crash/retention limits.
-- **Safer matching and uploads:** a legal-recipient gate joins final-total,
+- **Store and privacy boundaries:** marketplace copy now advertises
+  attachment-dependent automation plus report/manual mode. `PRIVACY.md`
+  documents provider processing, best-effort temp cleanup, and crash/retention
+  limits.
+- **Matching and upload controls:** a legal-recipient gate joins final-total,
   vendor, date, document-type, and uniqueness checks. Dedupe is scoped by
   issuer/recipient; a narrow competing-transaction ledger blocks reuse of an
   existing attachment. Approval binds the fresh transaction fields and file
@@ -39,8 +50,8 @@ and Cowork update per commit — their installed "version" is the git commit SHA
   “Search incomplete” result and block every mail-derived automatic upload.
 - **Calendar and automation fixed:** runs accept an optional year, January
   routines resolve December of the previous year correctly, and scheduled
-  runs are report-only in this release.
-- **Accounting-safe classification:** tax, payroll, contribution, payout,
+  runs produce reports only.
+- **Alternative-evidence classification:** tax, payroll, contribution, payout,
   transfer, and Qonto-fee rows remain visible as “Other evidence / manual
   decision” instead of being counted as skipped or complete.
 - **Focused launch scope:** the supported paths are local Claude Code sessions
@@ -49,7 +60,7 @@ and Cowork update per commit — their installed "version" is the git commit SHA
   GitHub marketplace in its UI; Codex still needs the CLI once. Update guidance
   is surface-specific. User-facing Codex skill examples use the canonical
   `$qonto-matchmaker:<skill>` namespace.
-- **Cowork starts safely:** Qonto work uses a directly started **Manually
+- **Cowork approval path:** Qonto work uses a directly started **Manually
   approve** task, declared connectors, and files the user attaches. Cowork can
   read Qonto, report missing receipts, and validate those files for manual
   upload. Built-in Gmail remains metadata-only and leads to a concrete manual

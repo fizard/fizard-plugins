@@ -114,7 +114,20 @@ def validate_openai_yaml(skill_dir: Path) -> None:
                 fail(f"{path.relative_to(ROOT)}: missing {key} asset {raw}")
 
 
+def validate_agent_instructions() -> None:
+    agents = ROOT / "AGENTS.md"
+    claude = ROOT / "CLAUDE.md"
+    if not agents.is_file():
+        fail("AGENTS.md is required")
+    if not claude.is_file():
+        fail("CLAUDE.md is required")
+        return
+    if claude.read_text(encoding="utf-8").strip() != "@AGENTS.md":
+        fail("CLAUDE.md must contain only @AGENTS.md")
+
+
 def validate() -> None:
+    validate_agent_instructions()
     claude_catalog = load_json(ROOT / ".claude-plugin" / "marketplace.json")
     codex_catalog = load_json(ROOT / ".agents" / "plugins" / "marketplace.json")
     claude_manifest = load_json(PLUGIN / ".claude-plugin" / "plugin.json")
@@ -123,9 +136,9 @@ def validate() -> None:
 
     expected = "qonto-matchmaker"
     canonical_description = (
-        "Finds missing Qonto receipts. With attachment-capable email, Claude "
-        "Code and Codex match and upload approved PDFs; Cowork validates files "
-        "for manual upload."
+        "Finds missing Qonto receipts. When the mail connector returns PDF "
+        "files, Claude Code and Codex validate matches and upload them after "
+        "user approval. Cowork validates attached PDFs for manual upload."
     )
     for label, manifest in (("Claude manifest", claude_manifest), ("Codex manifest", codex_manifest)):
         if manifest.get("name") != expected:
@@ -196,7 +209,11 @@ def validate() -> None:
     ):
         fail("Codex marketplace: qonto-matchmaker source is missing or wrong")
 
-    descriptions = [claude_manifest.get("description"), codex_manifest.get("description")]
+    descriptions = [
+        claude_manifest.get("description"),
+        codex_manifest.get("description"),
+        interface.get("longDescription"),
+    ]
     if isinstance(claude_plugins, list):
         descriptions.extend(
             item.get("description")

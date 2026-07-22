@@ -13,6 +13,9 @@ needed.
 
 #### Desktop app (no CLI required)
 
+**Prerequisites:** a Pro, Max, Team, or Enterprise plan. On Windows, install
+Git before starting a local Code-tab session.
+
 1. Open the **Code** tab, choose **Local**, and select a local working folder.
    It can be a dedicated empty folder; it does not need to contain this plugin
    repository.
@@ -28,10 +31,8 @@ needed.
 4. Open **+ → Plugins** to verify that **Qonto Matchmaker by Fizard** is
    installed.
 
-Claude Code Desktop requires a paid Claude plan. On Windows, Git is required
-for local sessions. See Anthropic's [desktop
-quickstart](https://code.claude.com/docs/en/desktop-quickstart) and [plugin
-installation guide](https://code.claude.com/docs/en/discover-plugins).
+See Anthropic's [desktop quickstart](https://code.claude.com/docs/en/desktop-quickstart)
+and [plugin installation guide](https://code.claude.com/docs/en/discover-plugins).
 
 #### CLI
 
@@ -67,27 +68,28 @@ Run `/reload-plugins` afterward, or start a new session.
 
 ### Claude Cowork — desktop app (no CLI required)
 
-1. Open **Cowork → Customize → Plugins → Browse plugins → Personal**.
-2. Select **+ → Add marketplace → Add from a repository**.
+**Prerequisites:** a paid Claude plan. On Team and Enterprise plans, an owner
+must enable Cowork and Skills.
+
+1. Open **Cowork → Customize → Plugins**.
+2. Under **Personal plugins**, select **+ → Add marketplace → Add from a
+   repository**.
 3. Enter `https://github.com/fizard/fizard-plugins`.
 4. Open **Fizard**, select **Qonto Matchmaker by Fizard**, and choose
    **Install**.
 5. Start a new Cowork task and choose **Manually approve**.
 
-Cowork plugins require a paid Claude plan. On Team and Enterprise plans, an
-owner must enable both Cowork and Skills. Personal plugins are installed on
-the current computer. See Anthropic's [plugin guide for
-Claude](https://support.claude.com/en/articles/13837440-use-plugins-in-claude).
+Personal plugins are installed on the current computer. See Anthropic's
+[plugin guide for Claude](https://support.claude.com/en/articles/13837440-use-plugins-in-claude).
 
-Start Qonto work in a Cowork task you open directly with **Manually approve**.
 Cowork reads Qonto, creates a missing-receipt report, and validates PDFs you
 attach. You then attach the validated file to the named transaction in Qonto.
 See Anthropic's [Cowork safety
 guidance](https://support.claude.com/en/articles/13364135-use-claude-cowork-safely).
 
-For a manual update, open **Customize → Plugins → Personal → Fizard**, use the
-marketplace's **Update** control, update or reinstall Qonto Matchmaker if
-prompted, and start a new Cowork task.
+For a manual update, open **Cowork → Customize → Plugins**. Under **Personal
+plugins**, open **Fizard** and then Qonto Matchmaker. Use **Update** or
+**Reinstall** when shown, then start a new Cowork task.
 
 ### Codex — app and CLI (one-time CLI setup)
 
@@ -133,34 +135,26 @@ codex plugin add qonto-matchmaker@fizard
 
 ### Qonto Matchmaker by Fizard (`qonto-matchmaker`)
 
-The matchmaker between your inbox and your bank account: it finds Qonto
-transactions with missing receipts. With an attachment-capable mailbox it
-matches invoice PDFs using strict checks and attaches only approved,
-unambiguous matches via the Qonto MCP; otherwise it provides a report and
-manual guidance. Every run ends with what's attached, what's missing (and
-whose card it was), and where to find the rest.
+Qonto Matchmaker finds Qonto transactions with missing receipts. When the mail
+connector returns PDF files, Claude Code and Codex validate invoice matches
+with six checks and upload them after the user approves the mapping. Cowork
+finds missing receipts and validates attached PDFs for manual upload. The final
+report shows changes, open items, known owners, and unresolved checks.
 
 *Qonto Matchmaker is an independent Fizard product — not affiliated with
 or endorsed by Qonto.*
 
-**Data and permissions:** the plugin itself is instructions plus connector
-configuration; it does not send invoice or bank data to a Fizard backend.
-Claude Code, Cowork, or Codex and the chosen mail provider process mailbox/PDF
-data. Claude Code and Codex upload to Qonto only after you approve the final
-mapping in an interactive standard run. In Cowork, you attach each validated
-file to Qonto yourself. Downloaded PDFs use a run-specific temporary directory
-in the active execution environment. The skill attempts cleanup after a
-controlled success, error, or stop; a crash, force-quit, or provider limitation
-can prevent it, and provider/session retention still applies. Scheduled runs
-and dry-runs produce reports only. Review the permissions and policies of every
-connected provider. See the plugin-specific [data and privacy notice](PRIVACY.md);
-questions can go to
+**Data and permissions:** the plugin contains instructions and Qonto connector
+configuration. It has no Fizard backend for matching and sends no invoice,
+mailbox, or bank data to Fizard. The selected AI surface, mail provider, and
+Qonto process the data. Claude Code and Codex upload only after the user
+approves the final mapping. In Cowork, the user uploads each validated file.
+See the [data and privacy notice](PRIVACY.md). Send privacy questions to
 [privacy@fizard.com](mailto:privacy@fizard.com).
 
-Before an automatic upload, the plugin may read existing PDFs on Qonto
-transactions that could compete for the same invoice. It compares only the
-fields and hash needed to prevent duplicate use; it does not audit those
-existing receipts for accounting correctness.
+Before an approved upload, the plugin may read PDFs on competing Qonto
+transactions. It compares the fields and hash needed to prevent duplicate use;
+it does not audit their accounting correctness.
 
 The official Qonto MCP can expose additional tools allowed by the user's
 Qonto role (for example card or invoice operations). The bundled `.mcp.json`
@@ -191,8 +185,8 @@ the setup ready.
   then start a new task. It qualifies only when `read_attachment` is available
   and the PDF probe succeeds. Use an Outlook integration only when the same
   probe succeeds.
-- **Claude Code:** connect an attachment-capable mail MCP that you or your
-  organization has reviewed. [Google's official Gmail
+- **Claude Code:** connect a mail MCP that you or your organization has
+  reviewed and that returns PDF files. [Google's official Gmail
   MCP](https://developers.google.com/workspace/gmail/api/reference/mcp)
   currently exposes attachment metadata but not PDF bytes, so it supports a
   missing-receipt report rather than automatic matching and upload.
@@ -206,32 +200,27 @@ the setup ready.
   See Anthropic's [Google Workspace connector
   limits](https://support.claude.com/en/articles/10166901-use-google-workspace-connectors).
 
-This release deliberately does not install or recommend a community mail
-server. Use limited mode unless an independently reviewed integration passes
-the same attachment test; third-party mail servers are not part of this
-plugin.
+Use a mail connector that you or your organization has reviewed. Full matching
+starts only after it passes the same attachment test. Until then, use the
+report or manual-file path.
 
 **Getting started:** in Claude Code, Cowork, or Codex, first ask *"Richte den
 Qonto Matchmaker ein."* In Codex, use `$qonto-matchmaker:fizard-onboard` if
 the workflow is not selected automatically. For a reconciliation, ask
 *"Gleiche meine Qonto-Belege für Juni 2026 ab."* In Claude Code or Cowork you
 can alternatively run `/qonto-matchmaker:reconcile-invoices Juni 2026`; in Codex,
-`$qonto-matchmaker:reconcile-invoices Juni 2026`. The year is optional; if
-omitted, the current year is used unless that would put the month in the
-future. On first use, onboarding verifies Qonto, every relevant mailbox,
-attachment download, and the prerequisites for upload. The first explicitly
-approved upload is the live proof of that route. If full automation is
-unavailable, onboarding says so and offers a report/manual path without
-claiming completion. Cowork always uses that limited path in this release.
+`$qonto-matchmaker:reconcile-invoices Juni 2026`. The year is optional. If it
+would place the month in the future, the plugin asks. On first use, onboarding
+checks Qonto, every relevant mailbox, PDF download, and upload prerequisites.
+The first approved upload proves that route. Cowork reports missing receipts
+and validates attached PDFs for manual upload.
 
 ## Feedback
 
-Ideas and improvement suggestions are always welcome — send them to
-[support@fizard.com](mailto:support@fizard.com), or hand them over in a
-standard session: if your connected mailbox can send mail, the plugin composes
-the message for you and sends it once you've approved the text. Dry-runs and
-scheduled runs never draft or send feedback. Cowork only shows the address; it
-does not draft or send mail.
+Send questions and feedback to
+[support@fizard.com](mailto:support@fizard.com). In an interactive Claude Code
+or Codex session with a mail sender, the plugin can draft the message and send
+it only after the user approves the text. Cowork shows the address.
 
 ## Release workflow (Fizard-internal)
 
@@ -255,8 +244,10 @@ does not draft or send mail.
 ## Structure
 
 ```
-.claude-plugin/marketplace.json          Claude Code catalog
-.agents/plugins/marketplace.json         Codex catalog
+AGENTS.md                               shared agent instructions
+CLAUDE.md                               Claude Code import of AGENTS.md
+.claude-plugin/marketplace.json         Claude Code catalog
+.agents/plugins/marketplace.json        Codex catalog
 plugins/qonto-matchmaker/
 ├── .claude-plugin/plugin.json           Claude Code manifest (commit-SHA versioning)
 ├── .codex-plugin/plugin.json            Codex manifest + version

@@ -1,6 +1,6 @@
 ---
 name: reconcile-invoices
-description: Use when the user wants to reconcile Qonto receipts with invoice emails for a calendar month — find completed Qonto transactions still requiring attachments, match invoice PDFs from attachment-capable mailboxes, and upload only strictly validated, explicitly approved matches. In Cowork, report and validate for manual upload only. Accept a month and optional year (for example, "Juni 2026"). Trigger on "reconcile receipts", "Belege abgleichen", "wo fehlen Rechnungen", "Rechnungen in Qonto hochladen", or Qonto receipt housekeeping.
+description: Use when the user wants to reconcile Qonto receipts with invoice emails for a calendar month — find completed Qonto transactions still requiring attachments, match invoice PDFs when the mail tools return PDF bytes, and upload only strictly validated, explicitly approved matches. In Cowork, report and validate for manual upload only. Accept a month and optional year (for example, "Juni 2026"). Trigger on "reconcile receipts", "Belege abgleichen", "wo fehlen Rechnungen", "Rechnungen in Qonto hochladen", or Qonto receipt housekeeping.
 ---
 
 # Qonto Matchmaker by Fizard
@@ -24,9 +24,9 @@ Before the self-update check or any Qonto/mail call, identify the host surface.
 Continue only in a **local Claude Code CLI/desktop Code session**, a **Claude
 Cowork task with this plugin active**, or the **Codex app/CLI**. On any other or
 unidentified surface, direct the user to one of these three paths and stop
-without network calls, setup, authentication, or data access. Cowork still has
-to pass every capability probe; its built-in Gmail connector alone does not
-establish full mode.
+without network calls, setup, authentication, or data access. Cowork must still
+pass every read capability used by its limited workflow; its built-in Gmail
+connector alone does not provide PDF attachment bytes.
 
 In Cowork, continue only in an interactive task that the user started directly
 with **Manually approve**. Otherwise, tell the user to start such a task and
@@ -75,11 +75,11 @@ bytes disable mail matching. Stop only when the read capability needed for the
 requested result is absent, and name it. Recheck capabilities at the step that
 uses them; sessions and permissions can expire.
 
-Before the roadmap's go, inspect only the available tool metadata; do not call
+Before the roadmap's go, inspect only available tool metadata; do not call
 Qonto or mail. After the user agrees, run the read-only authentication and
-capability probes below before collecting the month. The best-effort version
-check is the only pre-go network read and never touches the user's Qonto or
-mail data.
+capability probes before fetching transactions or searching mail. The
+best-effort version check is the only pre-go network read and never touches the
+user's Qonto or mail data.
 
 ### Required capabilities
 
@@ -103,10 +103,8 @@ mail data.
   succeeds. Prove the route with a harmless PDF before full mode.
 - **Upload:** standard mode needs a working binary PUT path to Qonto's signed
   upload URL (a shell such as `curl`, or an equivalent tool). Merely obtaining
-  an upload URL is not enough. Cowork is limited to read-only reporting and
-  manual-file validation in this release: never request an upload URL, call an
-  upload tool, or PUT a file from Cowork. Fizard must first release-test and
-  allowlist Qonto's complete signed-upload route from that environment.
+  an upload URL is not enough. Cowork uses report and manual-file mode: never
+  request an upload URL, call an upload tool, or PUT a file from Cowork.
 
 If only Qonto works, offer a **missing-transaction report**. If the current
 supported session can accept PDF files, validate and identify their
@@ -120,12 +118,12 @@ Never label a limited path as a full reconciliation.
   only after the user explicitly approves it.
 - **Limited:** produce the verified report and, when files are available,
   validate them and identify their Qonto transaction for manual upload. Never
-  write to Qonto. Cowork always uses this mode in this release.
+  write to Qonto. Cowork uses this mode.
 - **Dry-run:** read and report only. No Qonto writes, mailbox writes, file
   sends, routine creation, or other external changes.
-- **Scheduled:** always report-only in this release. Do not perform unattended
-  shell/network uploads or assume a confirmation. Every run uses the actual
-  previous calendar month and year and reports partial failures.
+- **Scheduled:** produce a report only. Do not perform unattended shell/network
+  uploads or assume a confirmation. Use the actual previous calendar month and
+  year and report partial failures.
 
 ### Limited-mode routing
 
@@ -222,11 +220,10 @@ next page. Do not assume a single response shape. Deduplicate by stable
 transaction id.
 
 A transaction is open when `status == "completed"`,
-`attachment_required == true`, and `attachment_ids` is empty. Pre-existing
-attachments count as attached; this release does not audit their accounting
-correctness. The narrow duplicate guard below still inspects attachments on
-transactions that could compete for a new candidate. Capture the card holder
-or initiator where Qonto provides it.
+`attachment_required == true`, and `attachment_ids` is empty. Count
+pre-existing attachments as attached; audit only the fields needed by the
+narrow duplicate guard below. Capture the card holder or initiator where Qonto
+provides it.
 
 For ownership, paginate both `list_cards` and `list_memberships`. Map `card_id`
 to the card's holder membership id and compare that id with
@@ -249,8 +246,9 @@ uploads require the Qonto transaction set to be complete.
 Some transactions often use evidence other than a supplier invoice. Do not
 auto-search them against invoice PDFs, but do not call them exempt, skipped,
 or complete either. Keep them visible under **Other evidence / manual
-decision** unless an attachment already exists or the user/accountant has
-made the decision elsewhere:
+decision** until an attachment exists. If the user or accountant has already
+decided how to document the transaction, keep the row there and record the
+decision; do not mark it attached or complete unless Qonto shows an attachment:
 
 - taxes and municipal treasury payments;
 - employee payroll;
@@ -259,14 +257,14 @@ made the decision elsewhere:
 - transfers between the organization's own accounts; and
 - Qonto fees.
 
-External contractors still require their own supplier invoice. Payment-
-provider fee debits normally have an invoice. The plugin makes no tax or
-accounting determination about whether evidence is legally required. Show
-every such row with transaction id, date, amount, counterparty, owner when
-known, and the reason it was not auto-searched; do not reduce this section to
-counts. If the authorized user records a manual decision during the run, add
-their authenticated identity, timestamp, and stated reason without presenting
-it as tax or legal advice.
+Do not place external-contractor debits in this category; search them for a
+supplier invoice. Treat payment-provider fee debits the same way when an
+invoice may exist. The plugin makes no tax or accounting determination about
+whether evidence is legally required. Show every such row with transaction id,
+date, amount, counterparty, owner when known, and the reason it was not
+auto-searched; do not reduce this section to counts. If the authorized user
+records a manual decision during the run, add their authenticated identity,
+timestamp, and stated reason without presenting it as tax or legal advice.
 
 Assign every transaction exactly one final status: **already attached**,
 **uploaded this run**, **validated — manual upload pending**, **review
@@ -357,13 +355,14 @@ competing set defined here.
 - **No match:** the amount hard gate fails or no candidate exists; do not
   force a candidate.
 
-For duplicate debits, assign distinct documents one-to-one only after every
-document passes all other rules and there is one uniquely best, non-tied
-mapping. Closest date may break a non-tied result but never override a failed
-rule; identical same-day charges without another discriminator require a
-user decision. Never attach the same hash or same `(issuer, recipient,
-invoice number)` to two transactions in the complete competing ledger.
-Same-price subscriptions also require a matching billing period.
+For duplicate debits, assign distinct documents one-to-one only when every
+document passes all other rules and one mapping is uniquely best. Use closest
+date as a tiebreaker only when it leaves exactly one mapping; it never
+overrides a failed rule. Identical same-day charges without another
+discriminator require a user decision. Never attach the same hash or same
+`(issuer, recipient, invoice number)` to two transactions in the complete
+competing ledger. Same-price subscriptions also require a matching billing
+period.
 
 When both invoice and payment receipt exist, attach only the invoice. A
 receipt-only fallback must still pass every other rule and be labeled
@@ -470,12 +469,14 @@ Show the final state in one compact table with sections:
   user must attach themselves.
 - **Missing receipts:** transactions in the mutually exclusive **no
   candidate** status, grouped by
-  authenticated user, unassigned, then other card holders; include a likely
-  source such as portal, paper receipt, or colleague mailbox.
+  authenticated user, unassigned, then other card holders. Include a likely
+  source only when the run found evidence for it; otherwise write **source
+  unknown**.
 - **Please review:** transactions in **review candidate**, with the matching
   rule that failed or could not be established and the concrete reason.
-- **Other evidence / manual decision:** the alternative-evidence categories,
-  still open unless already attached or decided outside this run.
+- **Other evidence / manual decision:** the alternative-evidence rows,
+  including any recorded manual decision; keep them open unless Qonto shows an
+  attachment.
 - **Upload failed:** system-owned retry items, separate from the person who
   made the payment.
 - **Search incomplete:** only when applicable, naming the account/mailbox,
@@ -542,8 +543,7 @@ In an interactive standard run only, if the surface supports recurring tasks
 and none exists, offer a monthly **report-only** routine. Ask for cadence,
 local time, and timezone before creating it; suggest the 5th at 09:00 for the
 previous calendar month. Never offer or create a routine in dry-run or
-scheduled mode or in Cowork, and never create one without approval. Scheduled
-uploads remain out of scope for this release.
+scheduled mode or in Cowork, and never create one without approval.
 
 ## Known limits
 
