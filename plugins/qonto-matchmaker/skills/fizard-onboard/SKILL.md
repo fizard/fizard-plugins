@@ -22,22 +22,16 @@ chosen or already known, stay in it unless the user switches.
 Before the normal first message, self-update check, or any Qonto/mail call,
 identify the host surface. Continue only in a **local Claude Code CLI/desktop
 Code session**, a **Claude Cowork task with this plugin active**, or the
-**Codex app/CLI**. Claude Chat, Claude Code remote/cloud sessions, the Codex
-IDE extension, Codex mobile, and other agents are not supported in this
-release. On any unsupported or unidentified surface, state that limitation,
-direct the user to one supported surface, and stop without network calls,
-setup, authentication, or data access. Cowork is a supported surface, not
-proof of full mode; every capability below must still pass its probe.
+**Codex app/CLI**. On any other or unidentified surface, direct the user to one
+of these three paths and stop without network calls, setup, authentication, or
+data access. Cowork still has to pass every capability below.
 
-In Cowork, continue only in an interactive task that the user started
-directly with **Manually approve**. If the task is scheduled, dispatched from
-mobile, unattended, or uses **Auto** or **Skip**, tell the user to start a new
-manual-approval task and stop before the update check or any data access.
-If the approval mode is not visible, ask the user to confirm it before data
-access.
-Never use Computer Use, Claude in Chrome, another browser, or direct Qonto or
-mail UI. Use only declared connectors, files the user attached to this task,
-and Cowork's isolated code or shell tools.
+In Cowork, continue only in an interactive task that the user started directly
+with **Manually approve**. Otherwise, tell the user to start such a task and
+stop before the update check or any data access. If the approval mode is not
+visible, ask the user to confirm it before data access. Use only declared
+connectors, files the user attached to this task, and Cowork's isolated code or
+shell tools. Do not interact with Qonto or mail through a user interface.
 
 The first message names the two steps — Qonto, then all invoice mailboxes —
 and asks for the go. Checks begin only after the user agrees. If the user

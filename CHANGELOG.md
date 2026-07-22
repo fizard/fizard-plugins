@@ -45,17 +45,15 @@ and Cowork update per commit — their installed "version" is the git commit SHA
   decision” instead of being counted as skipped or complete.
 - **Focused launch scope:** the supported paths are local Claude Code sessions
   in the desktop Code tab and CLI, Claude Cowork, and the Codex app and CLI.
-  Claude Chat, Claude Code remote sessions, Cursor, and other agents remain
-  unsupported. All three paths install without a repository checkout. Cowork
-  adds the public GitHub marketplace in its UI; Codex still needs the CLI once.
-  Update guidance is surface-specific. User-facing Codex skill examples use
-  the canonical `$qonto-matchmaker:<skill>` namespace.
-- **Cowork starts safely and stays limited:** Qonto work requires a directly
-  started **Manually approve** task. Auto, Skip, Dispatch, scheduled tasks,
-  Computer Use, browser control, automatic Qonto upload, and feedback mail are
-  blocked. Cowork can read Qonto, report missing receipts, and validate files
-  the user attaches. Built-in Gmail remains metadata-only and leads to a
-  concrete manual hand-off with its own pending status.
+  All three paths install without a repository checkout. Cowork adds the public
+  GitHub marketplace in its UI; Codex still needs the CLI once. Update guidance
+  is surface-specific. User-facing Codex skill examples use the canonical
+  `$qonto-matchmaker:<skill>` namespace.
+- **Cowork starts safely:** Qonto work uses a directly started **Manually
+  approve** task, declared connectors, and files the user attaches. Cowork can
+  read Qonto, report missing receipts, and validate those files for manual
+  upload. Built-in Gmail remains metadata-only and leads to a concrete manual
+  hand-off with its own pending status.
 - **Release gates expanded:** the Codex manifest now includes required store
   metadata, cross-platform skill metadata validates cleanly, and CI checks
   both catalogs, paths, assets, MCP config, and changelog/version alignment.

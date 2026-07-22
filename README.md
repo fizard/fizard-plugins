@@ -1,8 +1,8 @@
 # Fizard Plugins
 
-Plugins and agent skills by [Fizard](https://fizard.com). The initial release
-supports local Claude Code sessions in the desktop app and CLI, Claude Cowork,
-and the Codex app and CLI.
+Plugins and agent skills by [Fizard](https://fizard.com). Qonto Matchmaker runs
+in local Claude Code sessions in the desktop app and CLI, Claude Cowork, and
+the Codex app and CLI.
 
 ## Install
 
@@ -29,9 +29,7 @@ needed.
    installed.
 
 Claude Code Desktop requires a paid Claude plan. On Windows, Git is required
-for local sessions. This user-scoped installation is not carried into remote
-sessions, which are outside this release's support scope. Repo-managed cloud
-plugin deployment is a separate setup. See Anthropic's [desktop
+for local sessions. See Anthropic's [desktop
 quickstart](https://code.claude.com/docs/en/desktop-quickstart) and [plugin
 installation guide](https://code.claude.com/docs/en/discover-plugins).
 
@@ -46,8 +44,7 @@ claude plugin install qonto-matchmaker@fizard --scope user
 
 Start a new session afterward, or run `/reload-plugins` in an open one. With
 the scope choice above, both paths install the plugin at user scope, so it is
-available to the CLI and local Code-tab sessions on this computer. It does not
-publish the plugin to Claude Chat's Directory.
+available to the CLI and local Code-tab sessions on this computer.
 
 To receive updates automatically: `/plugin` → **Marketplaces** tab →
 select `fizard` → **Enable auto-update**. For a manual update in the desktop
@@ -68,8 +65,6 @@ claude plugin update qonto-matchmaker@fizard
 
 Run `/reload-plugins` afterward, or start a new session.
 
-Claude Chat and remote Claude Code sessions are not part of this release.
-
 ### Claude Cowork — desktop app (no CLI required)
 
 1. Open **Cowork → Customize → Plugins → Browse plugins → Personal**.
@@ -84,11 +79,10 @@ owner must enable both Cowork and Skills. Personal plugins are installed on
 the current computer. See Anthropic's [plugin guide for
 Claude](https://support.claude.com/en/articles/13837440-use-plugins-in-claude).
 
-Use Cowork only in a task you start directly. Do not use **Auto**, **Skip**,
-Dispatch, or a scheduled task for Qonto work. The current Cowork path reads
-Qonto, creates a missing-receipt report, and validates PDFs you attach. It
-does not upload files to Qonto automatically yet; attach the validated file
-to the named transaction in Qonto. See Anthropic's [Cowork safety
+Start Qonto work in a Cowork task you open directly with **Manually approve**.
+Cowork reads Qonto, creates a missing-receipt report, and validates PDFs you
+attach. You then attach the validated file to the named transaction in Qonto.
+See Anthropic's [Cowork safety
 guidance](https://support.claude.com/en/articles/13364135-use-claude-cowork-safely).
 
 For a manual update, open **Customize → Plugins → Personal → Fizard**, use the
@@ -125,7 +119,7 @@ Start a new task after installing. In the app, verify under
 `/plugins` → **Installed** that **Qonto Matchmaker by Fizard** is installed and
 enabled. If **Fizard** is missing, run `codex plugin marketplace list`, then
 `codex plugin marketplace upgrade fizard`, and restart the app. The installed
-plugin is available in the Codex app and CLI, not the IDE extension.
+plugin is available in the Codex app and CLI.
 
 Codex marketplace updates currently use the terminal. For a manual update,
 refresh and reinstall the cached plugin, then start a new task:
@@ -153,12 +147,12 @@ or endorsed by Qonto.*
 configuration; it does not send invoice or bank data to a Fizard backend.
 Claude Code, Cowork, or Codex and the chosen mail provider process mailbox/PDF
 data. Claude Code and Codex upload to Qonto only after you approve the final
-mapping in an interactive standard run. Cowork does not upload automatically
-in this release. Downloaded PDFs use a run-specific temporary directory in the
-active execution environment. The skill attempts cleanup after a controlled
-success, error, or stop; a crash, force-quit, or provider limitation can
-prevent it, and provider/session retention still applies. Scheduled runs and
-dry-runs are report-only. Review the permissions and policies of every
+mapping in an interactive standard run. In Cowork, you attach each validated
+file to Qonto yourself. Downloaded PDFs use a run-specific temporary directory
+in the active execution environment. The skill attempts cleanup after a
+controlled success, error, or stop; a crash, force-quit, or provider limitation
+can prevent it, and provider/session retention still applies. Scheduled runs
+and dry-runs produce reports only. Review the permissions and policies of every
 connected provider. See the plugin-specific [data and privacy notice](PRIVACY.md);
 questions can go to
 [privacy@fizard.com](mailto:privacy@fizard.com).
